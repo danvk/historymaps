@@ -3,11 +3,70 @@
 <head>
   <title>Map Vectorizer</title>
   <script type="text/javascript" src="jquery-1.7.min.js"></script>
+  <script type="text/javascript" src="sylvester.js"></script>
   <!--
   <script type="text/javascript" src="jquery-ui-1.8.16.custom.min.js"></script>
+366,301 -> 35.16842120848443,26.1328125
+81,206 -> 41.20152937903652,8.257600339456872
+239,228 -> 39.815853365763644,18.284775128251567
+568,111 -> 47.0836462419687,39.22857257119813
+1122,151 -> 45.01444261113682,74.20160567073913
+1203,116 -> 46.66973408414093,79.20528448115601
+1207,706 -> 9.822530557265244,79.94911840062753
+1448,765 -> 5.450342127570988,95.37838526737596
+1416,641 -> 13.613928201065981,93.00937793256526
+758,669 -> 11.858161593282713,51.22041221850077
+83,805 -> 3.260553184498292,8.62039504173705
+125,273 -> 36.96411146161893,11.016820615981272
+495,294 -> 35.62344720227446,34.50070016748539
+840,440 -> 26.3641315479178,56.46154213781549
+511,487 -> 23.39554206450599,35.55809572931162
+802,276 -> 36.803753754069035,54.042752395712114
+921,121 -> 46.57804295179348,61.44834406278448
+784,121 -> 46.58146751718745,52.75574832834628
   -->
   <script type="text/javascript">
   $(document).on('selectstart dragstart', '.noselect', function(){ return false; });
+
+  // Given existing (x, y) -> (lat, lon) pairs, guess the (lat, lon) for (x, y)
+  function guessLatLon(map, pairs, x, y) {
+    if (pairs.length == 0) {
+      // guess the center -- we don't have anything else to go on.
+      // (or, maybe do something like the next case w/ the centers as points of commonality)
+      var ll = map.getCenter();
+      return [ ll.lat(), ll.lng() ];
+    }
+
+    if (pairs.length == 1 || pairs.length == 2) {
+      // assume that the maps are just scaled versions of one another.
+      var p = pairs[0];
+      var x_delta = x - p.image_x;
+      var y_delta = y - p.image_y;
+      var map_span = map.getBounds().toSpan();
+      return [p.lat - (y_delta) * map_span.lat() / $('#img').height(),
+              p.lon + (x_delta) * map_span.lng() / $('#img').width()];
+    }
+
+    // With three or more points, we can do a full linear regression.
+    var lats = [], lons = [], xys = [], x;
+    for (var i = 0; i < pairs.length; i++) {
+      lats.push(pairs[i].lat);
+      lons.push(pairs[i].lon);
+      xys.push([1, pairs[i].image_x, pairs[i].image_y]);
+    }
+    x = $V([1, x, y]);
+
+    lat_vec = $V(lats);
+    lon_vec = $V(lons);
+    X = $M(xys);
+    var Xt = X.transpose();
+    var inv = (Xt.x(X)).inverse().x(Xt);
+    var lat_params = inv.x(lat_vec);
+    var lon_params = inv.x(lon_vec);
+
+    return [ lat_params.dot(x), lon_params.dot(x) ];
+  }
+
   </script>
   <script type="text/javascript"
       src="http://maps.google.com/maps/api/js?sensor=false">
@@ -126,11 +185,12 @@
         // create a new marker pair
         var x = evt.offsetX - this.offsetLeft;
         var y = evt.offsetY - this.offsetTop;
+        var guess_ll = guessLatLon(map, pairs, x, y);
         var pair = {
           image_x: x,
           image_y: y,
-          lat: 25,
-          lon: 30,
+          lat: guess_ll[0],
+          lon: guess_ll[1],
           image_marker: null,
           map_marker: null
         };
@@ -186,8 +246,15 @@
           visible: true,
           icon: selected_marker_img,
           draggable: true,
-          raiseOnDrag: false
+          raiseOnDrag: false,
         });
+        google.maps.event.addListener(marker, 'dragend', (function(i) {
+          return function(evt) {
+            pairs[i].lat = evt.latLng.lat();
+            pairs[i].lon = evt.latLng.lng();
+          }
+        })(pairs.length - 1));
+
         pair.map_marker = marker;
         setSelection(pairs.length - 1);
       });
