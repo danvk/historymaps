@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Map Vectorizer</title>
+  <script type="text/javascript" src="jquery-1.7.min.js"></script>
+  <!--
+  <script type="text/javascript" src="jquery-ui-1.8.16.custom.min.js"></script>
+  -->
+  <script type="text/javascript">
+  $(document).on('selectstart dragstart', '.noselect', function(){ return false; });
+  </script>
+  <script type="text/javascript"
+      src="http://maps.google.com/maps/api/js?sensor=false">
+  </script>
+
+  <style type="text/css">
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  .container {
+  }
+  #left {
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    position: absolute;
+    overflow: scroll;
+  }
+  #right {
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    position: absolute;
+  }
+  #gmap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+  }
+  .image_marker {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    margin-left: -16px;
+    margin-top: -16px;
+    background-image: url('dot.png');
+  }
+  .selected_marker {
+    background-image: url('crosshair.gif');
+  }
+  </style>
+</head>
+<body>
+  <div id="left" class="container noselect">
+    <img id="img" class='noselect' src="Persia_500bc.jpg" width=1565 height=912 />
+  </div>
+  <div id="right" class="container">
+    <div id="gmap"></div>
+  </div>
+
+  <script type="text/javascript">
+    $(function() {
+      var latlng = new google.maps.LatLng(25, 30);
+      var opts = {
+        zoom: 4,
+        center: latlng,
+        mapTypeId: google.maps.MapTypeId.TERRAIN,
+        styles: [
+          {
+            featureType: "administrative",
+            stylers: [
+              { visibility: "off" }
+            ]
+          },{
+            featureType: "road",
+            stylers: [
+              { visibility: "off" }
+            ]
+          },{
+            featureType: "landscape.man_made",
+            stylers: [
+              { visibility: "off" }
+            ]
+          },{
+            featureType: "poi",
+            stylers: [
+              { visibility: "off" }
+            ]
+          }
+        ]
+      };
+      
+      map = new google.maps.Map(document.getElementById("gmap"), opts);
+
+      selected_marker_img = new google.maps.MarkerImage(
+        'crosshair.gif',
+        new google.maps.Size(32, 32),  // size
+        new google.maps.Point(0, 0),   // origin
+        new google.maps.Point(16, 16)  // anchor
+      );
+      nonselected_marker_img = new google.maps.MarkerImage(
+        'dot.png',
+        new google.maps.Size(32, 32),  // size
+        new google.maps.Point(0, 0),   // origin
+        new google.maps.Point(16, 16)  // anchor
+      );
+
+      pairs = [];
+
+      var setSelection = function(idx) {
+        $('.image_marker').removeClass('selected_marker');
+        $(pairs[idx].image_marker).addClass('selected_marker');
+        for (var i = 0; i < pairs.length; i++) {
+          if (i == idx) continue;
+          pairs[i].map_marker.setIcon(nonselected_marker_img);
+        }
+        pairs[idx].map_marker.setIcon(selected_marker_img);
+      }
+
+      $('#img').on('dblclick', function(evt) {
+        // create a new marker pair
+        var x = evt.offsetX - this.offsetLeft;
+        var y = evt.offsetY - this.offsetTop;
+        var pair = {
+          image_x: x,
+          image_y: y,
+          lat: 25,
+          lon: 30,
+          image_marker: null,
+          map_marker: null
+        };
+        pairs.push(pair);
+
+        var image_marker = $('<div></div>')
+            .data('pair_num', pairs.length - 1)
+            .css({
+              left: x + 'px',
+              top: y + 'px'
+            })
+            .addClass('image_marker').addClass('selected_marker')
+            .on('click', function(evt) {
+              setSelection($(this).data('pair_num'));
+            })
+            .on('mousedown', function(evt) {
+              setSelection($(this).data('pair_num'));
+              var state = {
+                dragStartPageX: evt.pageX,
+                dragStartPageY: evt.pageY,
+                startLeft: parseInt($(this).css('left')),
+                startTop: parseInt($(this).css('top')),
+                marker: this
+              };
+              $('#left').on('mousemove', '', state, function(evt) {
+                var movement_x = evt.pageX - evt.data.dragStartPageX;
+                var movement_y = evt.pageY - evt.data.dragStartPageY;
+                $(evt.data.marker).css({
+                  left: evt.data.startLeft + movement_x + 'px',
+                  top: evt.data.startTop + movement_y + 'px'
+                });
+              }).on('mouseup', '', state, function(evt) {
+                var final_x = evt.data.startLeft + evt.pageX - evt.data.dragStartPageX;
+                var final_y = evt.data.startTop + evt.pageY - evt.data.dragStartPageY;
+                $(evt.data.marker).css({
+                  left: final_x + 'px',
+                  top: final_y + 'px'
+                });
+                var pair = pairs[$(evt.data.marker).data('pair_num')];
+                pair.image_x = final_x;
+                pair.image_y = final_y;
+                $(this).off('mousemove');
+                $(this).off('mouseup');
+              });
+            })
+            ;
+        $('#left').append(image_marker);
+        pair.image_marker = image_marker;
+
+        var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(pair.lat, pair.lon),
+          map: map,
+          visible: true,
+          icon: selected_marker_img,
+          draggable: true,
+          raiseOnDrag: false
+        });
+        pair.map_marker = marker;
+        setSelection(pairs.length - 1);
+      });
+
+      $('#img').on('click', function() {
+        $('.image_marker').removeClass('selected_marker');
+      });
+    });
+  </script>
+</body>
+</html>
