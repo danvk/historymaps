@@ -1,4 +1,4 @@
-application: linesonamap
+application: lines-on-a-map
 
 version: 1
 runtime: python
