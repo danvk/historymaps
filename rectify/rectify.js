@@ -1,3 +1,6 @@
+var talkToServer = false;
+var endpoint = '/update_rectification';
+
 // Given existing (x, y) -> (lat, lon) pairs, guess the (lat, lon) for (x, y)
 function guessLatLon(map, pairs, x, y) {
   if (pairs.length == 0) {
@@ -38,7 +41,7 @@ function guessLatLon(map, pairs, x, y) {
   return [ lat_params.dot(x), lon_params.dot(x) ];
 }
 
-function initialize() {
+function initialize(init_pairs) {
   var latlng = new google.maps.LatLng(25, 30);
   var opts = {
     zoom: 4,
@@ -86,95 +89,130 @@ function initialize() {
 
   pairs = [];
 
-  var setSelection = function(idx) {
-    $('.image_marker').removeClass('selected_marker');
-    $(pairs[idx].image_marker).addClass('selected_marker');
-    for (var i = 0; i < pairs.length; i++) {
-      if (i == idx) continue;
-      pairs[i].map_marker.setIcon(nonselected_marker_img);
-    }
-    pairs[idx].map_marker.setIcon(selected_marker_img);
-  }
-
   $('#img').on('dblclick', function(evt) {
     // create a new marker pair
     var x = evt.offsetX - this.offsetLeft;
     var y = evt.offsetY - this.offsetTop;
     var guess_ll = guessLatLon(map, pairs, x, y);
-    var pair = {
-      image_x: x,
-      image_y: y,
-      lat: guess_ll[0],
-      lon: guess_ll[1],
-      image_marker: null,
-      map_marker: null
-    };
-    pairs.push(pair);
-
-    var image_marker = $('<div></div>')
-        .data('pair_num', pairs.length - 1)
-        .css({
-          left: x + 'px',
-          top: y + 'px'
-        })
-        .addClass('image_marker').addClass('selected_marker')
-        .on('click', function(evt) {
-          setSelection($(this).data('pair_num'));
-        })
-        .on('mousedown', function(evt) {
-          setSelection($(this).data('pair_num'));
-          var state = {
-            dragStartPageX: evt.pageX,
-            dragStartPageY: evt.pageY,
-            startLeft: parseInt($(this).css('left')),
-            startTop: parseInt($(this).css('top')),
-            marker: this
-          };
-          $('#left').on('mousemove', '', state, function(evt) {
-            var movement_x = evt.pageX - evt.data.dragStartPageX;
-            var movement_y = evt.pageY - evt.data.dragStartPageY;
-            $(evt.data.marker).css({
-              left: evt.data.startLeft + movement_x + 'px',
-              top: evt.data.startTop + movement_y + 'px'
-            });
-          }).on('mouseup', '', state, function(evt) {
-            var final_x = evt.data.startLeft + evt.pageX - evt.data.dragStartPageX;
-            var final_y = evt.data.startTop + evt.pageY - evt.data.dragStartPageY;
-            $(evt.data.marker).css({
-              left: final_x + 'px',
-              top: final_y + 'px'
-            });
-            var pair = pairs[$(evt.data.marker).data('pair_num')];
-            pair.image_x = final_x;
-            pair.image_y = final_y;
-            $(this).off('mousemove');
-            $(this).off('mouseup');
-          });
-        })
-        ;
-    $('#left').append(image_marker);
-    pair.image_marker = image_marker;
-
-    var marker = new google.maps.Marker({
-      position: new google.maps.LatLng(pair.lat, pair.lon),
-      map: map,
-      visible: true,
-      icon: selected_marker_img,
-      draggable: true,
-      raiseOnDrag: false,
-    });
-    google.maps.event.addListener(marker, 'dragend', (function(i) {
-      return function(evt) {
-        pairs[i].lat = evt.latLng.lat();
-        pairs[i].lon = evt.latLng.lng();
-      }
-    })(pairs.length - 1));
-
-    pair.map_marker = marker;
-    setSelection(pairs.length - 1);
+    addPair(x, y, guess_ll[0], guess_ll[1]);
+    updateServer();
   });
 
   $('#img').on('click', function() {
     $('.image_marker').removeClass('selected_marker');
   });
+}
+
+function setSelection(idx) {
+  $('.image_marker').removeClass('selected_marker');
+  $(pairs[idx].image_marker).addClass('selected_marker');
+  for (var i = 0; i < pairs.length; i++) {
+    if (i == idx) continue;
+    pairs[i].map_marker.setIcon(nonselected_marker_img);
+  }
+  pairs[idx].map_marker.setIcon(selected_marker_img);
+}
+
+function addPair(image_x, image_y, lat, lon) {
+  var pair = {
+    image_x: image_x,
+    image_y: image_y,
+    lat: lat,
+    lon: lon,
+    image_marker: null,
+    map_marker: null
+  };
+  pairs.push(pair);
+
+  var image_marker = $('<div></div>')
+      .data('pair_num', pairs.length - 1)
+      .css({
+        left: image_x + 'px',
+        top: image_y + 'px'
+      })
+      .addClass('image_marker').addClass('selected_marker')
+      .on('click', function(evt) {
+        setSelection($(this).data('pair_num'));
+      })
+      .on('mousedown', function(evt) {
+        setSelection($(this).data('pair_num'));
+        var state = {
+          dragStartPageX: evt.pageX,
+          dragStartPageY: evt.pageY,
+          startLeft: parseInt($(this).css('left')),
+          startTop: parseInt($(this).css('top')),
+          marker: this
+        };
+        $('#left').on('mousemove', '', state, function(evt) {
+          var movement_x = evt.pageX - evt.data.dragStartPageX;
+          var movement_y = evt.pageY - evt.data.dragStartPageY;
+          $(evt.data.marker).css({
+            left: evt.data.startLeft + movement_x + 'px',
+            top: evt.data.startTop + movement_y + 'px'
+          });
+        }).on('mouseup', '', state, function(evt) {
+          var final_x = evt.data.startLeft + evt.pageX - evt.data.dragStartPageX;
+          var final_y = evt.data.startTop + evt.pageY - evt.data.dragStartPageY;
+          $(evt.data.marker).css({
+            left: final_x + 'px',
+            top: final_y + 'px'
+          });
+          var pair = pairs[$(evt.data.marker).data('pair_num')];
+          pair.image_x = final_x;
+          pair.image_y = final_y;
+          $(this).off('mousemove');
+          $(this).off('mouseup');
+          updateServer();
+        });
+      })
+      ;
+  $('#left').append(image_marker);
+  pair.image_marker = image_marker;
+
+  var marker = new google.maps.Marker({
+    position: new google.maps.LatLng(pair.lat, pair.lon),
+    map: map,
+    visible: true,
+    icon: selected_marker_img,
+    draggable: true,
+    raiseOnDrag: false,
+  });
+  google.maps.event.addListener(marker, 'dragend', (function(i) {
+    return function(evt) {
+      pairs[i].lat = evt.latLng.lat();
+      pairs[i].lon = evt.latLng.lng();
+      updateServer();
+    }
+  })(pairs.length - 1));
+
+  pair.map_marker = marker;
+  setSelection(pairs.length - 1);
+}
+
+function updateServer() {
+  var data = {
+    image: $('#img').attr('src'),
+    pairs: [
+    ]
+  };
+
+  for (var i = 0; i < pairs.length; i++) {
+    var p = pairs[i];
+    data.pairs.push({
+      lat: p.lat,
+      lon: p.lon,
+      image_x: p.image_x,
+      image_y: p.image_y
+    });
+  }
+
+  if (!talkToServer) {
+    console.log(data);
+  } else {
+    var req = new XMLHttpRequest();
+    var caller = this;
+    req.open("POST", url, true);
+    req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    req.send(JSON.stringify(data));
+  }
 }

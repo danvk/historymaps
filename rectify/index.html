@@ -5,15 +5,20 @@
   <script type="text/javascript" src="jquery-1.7.min.js"></script>
   <script type="text/javascript" src="sylvester.js"></script>
   <script type="text/javascript" src="rectify.js"></script>
-  <!--
-  <script type="text/javascript" src="jquery-ui-1.8.16.custom.min.js"></script>
-  -->
-  <script type="text/javascript">
-  $(document).on('selectstart dragstart', '.noselect', function(){ return false; });
-
-  </script>
   <script type="text/javascript"
       src="http://maps.google.com/maps/api/js?sensor=false">
+  </script>
+  <script type="text/javascript">
+    // disable selections on elements where it doesn't make sense.
+    $(document).on('selectstart dragstart', '.noselect', function(){
+      return false;
+    });
+    $(function() {
+      var init_pairs = [
+        // ...
+      ];
+      initialize(init_pairs);
+    });
   </script>
 
   <style type="text/css">
@@ -58,16 +63,13 @@
   }
   </style>
 </head>
+
 <body>
   <div id="left" class="container noselect">
-    <img id="img" class='noselect' src="Persia_500bc.jpg" width=1565 height=912 />
+    <img id="img" class='noselect' src="Persia_500bc.jpg" />
   </div>
   <div id="right" class="container">
     <div id="gmap"></div>
   </div>
-
-  <script type="text/javascript">
-    $(initialize);
-  </script>
 </body>
 </html>
