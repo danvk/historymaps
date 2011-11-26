@@ -1,0 +1,20 @@
+<html>
+<head>
+<title>List of maps being rectified</title>
+</head>
+<body>
+<h3>Images</h3>
+<ol>
+  {% for url in urls %}
+  <li><a href="/rectify?image_url={{url|escape}}">{{url}}</a></li>
+  {% endfor %}
+</ol>
+
+<p>Or enter a new image URL:</p>
+<form action="/rectify" method="get">
+URL: <input type="text" size=120 name=image_url value="http://..." />
+<br/>
+<input type=submit />
+</form>
+</body>
+</html>

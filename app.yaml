@@ -1,0 +1,14 @@
+application: linesonamap
+
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /rectify
+  script: rectify.py
+- url: /update_rectification
+  script: rectify.py
+- url: /(.*\.(js|gif|png|css|jpg))
+  static_files: rectify/\1
+  upload: rectify/(.*\.(gif|png|jpg|css|js))

@@ -1,4 +1,4 @@
-var talkToServer = false;
+var talkToServer = true;
 var endpoint = '/update_rectification';
 
 var pairs = [];
@@ -217,8 +217,8 @@ function updateServer() {
   } else {
     var req = new XMLHttpRequest();
     var caller = this;
-    req.open("POST", url, true);
+    req.open("POST", endpoint, true);
     req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    req.send(JSON.stringify(data));
+    req.send('data=' + escape(JSON.stringify(data)));
   }
 }
