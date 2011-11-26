@@ -1,6 +1,8 @@
 var talkToServer = false;
 var endpoint = '/update_rectification';
 
+var pairs = [];
+
 // Given existing (x, y) -> (lat, lon) pairs, guess the (lat, lon) for (x, y)
 function guessLatLon(map, pairs, x, y) {
   if (pairs.length == 0) {
@@ -88,6 +90,10 @@ function initialize(init_pairs) {
   );
 
   pairs = [];
+  for (var i = 0; i < init_pairs.length; i++) {
+    var p = init_pairs[i];
+    addPair(p.image_x, p.image_y, p.lat, p.lon);
+  }
 
   $('#img').on('dblclick', function(evt) {
     // create a new marker pair
