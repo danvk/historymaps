@@ -1,0 +1,36 @@
+12/23/11
+I ordered 2500 SVG maps from worldhistorymaps.com.
+CD didn't work on my old macbook, but i was able to use Raven's laptop to
+transfer them via thumb drive.
+out of the box, the maps render poorly in all browsers except Opera.
+In Opera, it's impossible to zoom. And the features are tiny (Europe vs. world)
+
+The problem is that they're using a clipping layer to impose water boundaries.
+This is clever -- it lets them use much simpler polygons for each
+country/nation and keep the water boundaries constant across time. They include
+a PNG clipping layer and an SVG clipping layer. Only Opera lines these up
+correctly. Every browser handles the SVG clipping fine, but they screw up the
+SVG. Even Opera messes up the alignment when you zoom via the SVG file's
+"zoomBox" directive.
+
+I'm able to zoom nicely in Safari one I comment out the SVG clipping path (Wgeo.svg).
+
+ImageMagick supports SVG, so rasterizing from the command line may be the best
+option of all.
+
+
+This brings up some questions in terms of how I store shapes. I'd assumed that
+every country would include things like coastlines. There would be a feature in
+the editor which would let you snap to coastlines, rivers, lakes, etc.
+But maybe that's too expensive. Maybe it's better to have loose, simple shapes
+and apply a filter later.
+
+The SVG clipping layer is pretty large (1.1MB). A good approach might be to
+serve up a tiled clipping layer, ala Google Maps. Then shapes could be
+transmitted simply and the clipping could be done in-browser. worldhistorymaps
+implements their clipping layer as a full image of the earth's water. But a
+black/white mask would work better.
+
+Questions:
+- What is the overall size of the Roman Empire paths across all time?
+- How much do paths change from year to year? How large is the avg. diff?
