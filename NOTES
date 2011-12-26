@@ -1,3 +1,15 @@
+12/26/11
+Goal is to extract path information in a way that lets me play maps through
+time.
+
+This would look something like:
+
+  "country name" -> [year as int] -> path
+
+This will let me answer questions like the ones below.
+
+
+
 12/23/11
 I ordered 2500 SVG maps from worldhistorymaps.com.
 CD didn't work on my old macbook, but i was able to use Raven's laptop to
