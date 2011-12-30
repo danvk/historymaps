@@ -1,29 +1,26 @@
 #!/usr/bin/python
 
-from BeautifulSoup import BeautifulSoup
+import whm
+import sys
 import re
-import glob
 
-def name_to_year(name):
-  # Name is something like worldhistorymaps/html/WA2000.svg
-  m = re.search(r'W([AB])(\d{4})\.svg', name)
-  assert m
-  ab = m.group(1)
-  y = int(m.group(2))
-  return (-1 if ab == 'B' else 1) * y
-
-for f in sorted(glob.glob('worldhistorymaps/html/W?????.svg'), key=name_to_year):
-  bs = BeautifulSoup(file(f))
-
-  rome_soup = bs(text=re.compile('Rome'))
-  title = [t.parent for t in rome_soup if t.parent.name == 'title']
-  if len(title) == 0:
+last_shape = ''
+for year in range(-390, 500):
+  svg = whm.SvgFile.forYear(year)
+  if not svg:
+    sys.stderr.write('%+5d: Missing file\n' % year)
     continue
 
-  # there are dupes in a few places. Also East Rome/West Rome in 400-500.
-  match = title[0].parent
-  rome_id = match['id']
-  path = bs('path', id=rome_id)
-  assert len(path) == 1, len(path)
+  info = svg.info_for_country('Rome')
+  if not info:
+    sys.stderr.write('%+5d: No Rome\n' % year)
+    continue
 
-  print '%s %s' % (f, path[0])
+  shape = svg.shape_for_id(info['id'])
+  shape = re.sub(r'\r|\n', '', shape)
+  if shape != last_shape:
+    print '%+5d: %s' % (year, shape)
+    last_shape = shape
+
+  if year % 100 == 0:
+    sys.stderr.write('%+5d: ...\n' % year)

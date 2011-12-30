@@ -6,6 +6,8 @@ from datetime import datetime
 import re
 import glob
 
+kBaseDir = 'worldhistorymaps/html'
+
 def filename_to_year(name):
   """Name is something like worldhistorymaps/html/WA2000.svg
   Returns 2000, -50, etc."""
@@ -16,14 +18,14 @@ def filename_to_year(name):
   return (-1 if ab == 'B' else 1) * y
 
 
-def ordered_map_files(html_dir="worldhistorymaps/html"):
+def ordered_map_files(html_dir=kBaseDir):
   """Returns a list of SVG files ordered by year."""
   return sorted(glob.glob(html_dir + '/W?????.svg'), key=filename_to_year)
 
 
 def all_ordered_map_files():
   return sorted(ordered_map_files() +
-                ordered_map_files('worldhistorymaps/html/off-years'),
+                ordered_map_files(kBaseDir + '/off-years'),
                 key=filename_to_year)
 
 
@@ -113,6 +115,23 @@ def possessive_form(country):
 
 
 class SvgFile(object):
+  @staticmethod
+  def forYear(y):
+    if y < -500 or y > 2010 or y == 0: return None
+    p = kBaseDir
+    if y < 0:
+      if y % 50 == 0:
+        p += '/WB%04d.svg' % (-y)
+      else:
+        p += '/off-years/WB%04d.svg' % (-y)
+    else:
+      if y % 50 == 0 or y == 1:
+        p += '/WA%04d.svg' % y
+      else:
+        p += '/off-years/WA%04d.svg' % y
+
+    return SvgFile(p)
+
   def __init__(self, filename):
     self._bs = BeautifulSoup(file(filename))
     self._filename = filename
@@ -168,5 +187,23 @@ class SvgFile(object):
       Chile
     </text>
     """
-    return [c['name'] for c in self._countries]
+    return sorted(list(set([c['name'] for c in self._countries])))
+
+  def info_for_country(self, country):
+    """Returns a country dict or None"""
+    c = [c for c in self._countries if c['name'] == country]
+    if not c: return None
+    return c[0]
+
+  def shape_for_id(self, country_id):
+    """id is something from countries()[*]['id']"""
+    path = self._bs('path', id=country_id)
+    if not path: return None
+    path = path[0]
+    try:
+      return path['d']
+    except KeyError, e:
+      print path
+      return None
+
 
