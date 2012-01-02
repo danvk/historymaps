@@ -34,6 +34,24 @@ for name in countries:
         data[year] = shape
 
 
+
+# go through and add a blank in the year before an empire comes into existence.
+# this is more complicated than you'd think because some empires (e.g.
+# Byzantium) come and go.
+for name, data in country_shapes.iteritems():
+  #first_year, last_year = min(data.keys()), max(data.keys())
+  last_shape = ''
+  blank_years_to_add = []
+  for year in sorted(data.keys()):
+    shape = data[year]
+    if last_shape == '' and shape != '':
+      blank_years_to_add.append(year - 1)
+    last_shape = shape
+
+  for year in blank_years_to_add:
+    data[year] = ''
+
+
 hash_data = defaultdict(lambda : defaultdict(str))  # year -> name -> shape
 for name, data in country_shapes.iteritems():
   hash_data[min(data.keys()) - 1][name] = ''  # year before it existed.
@@ -50,3 +68,5 @@ print json.dumps(array_data, separators=(',',':'))
 
 print 'var colors = ',
 print json.dumps(country_colors, separators=(',',':'))
+
+print 'var end_year = %d;' % end_year
