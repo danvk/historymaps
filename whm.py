@@ -197,6 +197,8 @@ class SvgFile(object):
 
   def shape_for_id(self, country_id):
     """id is something from countries()[*]['id']"""
+    # TODO(danvk): support ellipse countries, e.g.:
+    # <ellipse id="298757" cx="19136" cy="4420" rx="18" ry="18" fill="#E6FFE2"/>
     path = self._bs('path', id=country_id)
     if not path: return None
     path = path[0]

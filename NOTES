@@ -1,3 +1,20 @@
+12/30/11
+Using an inline SVG element and a transparent PNG overlay, I was able to make a
+nice slider demo of the Roman empire. This is really basic, but it's already
+compelling and recognizably related to the end goal. I already feel like I'm
+learning things from it, e.g. about how Rome expanded initially, and what some
+of the territories were that came and went from their control. 117 A.D. seemed
+to be the peak.
+
+I was worried that the PNG on SVG system would be too slow, but this turned out
+to be because I was using a PNG file 10x larger than it needed to be. Reducing
+to an 800x600 PNG made everything fast again. 
+
+Next questions:
+- Is it still fast w/ tiles (almost certainly yes)
+- Can I add other nations to this demo?
+
+
 12/26/11
 Goal is to extract path information in a way that lets me play maps through
 time.

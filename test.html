@@ -1,31 +1,77 @@
 <html>
 <head>
 <title>SVG test</title>
-  <script type="text/javascript" src="rome.js"></script>
-  <link type="text/css" href="jquery/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
   <!--
-  <script type="text/javascript" src="jquery/jquery-1.5.1.min.js"></script>
-  <script type="text/javascript" src="jquery/jquery-ui-1.8.14.custom.min.js"></script>
+  <script type="text/javascript" src="rome.js"></script>
   -->
+  <script type="text/javascript" src="several_countries2.js"></script>
+  <link type="text/css" href="jquery/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
   <script type='text/javascript' src='https://www.google.com/jsapi?key=ABQIAAAAafDALeUVyxhUndZQcT0BRRQjgiEk1Ut90lZbiCSD8tXKcVgrkBQLYOFQ3xwutc5R9SNzfGaKxMnf7g'></script>
 
   <script type="text/javascript">
+    var colors = {
+      "Rome": '#F5C60C',
+      "Byzantium": '#FFB7B7',
+      "Parthia": '#80FFFF',
+      "Arabia": '#C4FFC4',
+      "Ottomans": '#F4D89B',
+      'HRE': '#F2C2AE',
+      'Persia': '#80FFFF'
+    };
     google.load("jquery", "1.7.1");
     google.load("jqueryui", "1.8.16");
     google.setOnLoadCallback(function() {
       $(function(){
+        var last_drawn_idx = -1;
+
+        // create paths for all empires/nations
+        var all_countries = {}
+        for (var i = 0; i < rome.length; i++) {
+          for (var k in rome[i][1]) {
+            all_countries[k] = 1;
+          }
+        }
+        for (var k in all_countries) {
+          var el = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          el.id = k;
+          el.setAttribute('stroke-width', 10);
+          el.setAttribute('fill', colors[k]);
+          el.setAttribute('stroke-linejoin', 'round');
+          el.setAttribute('d', 'M 11445 4535 z');
+          document.getElementById('ctry').appendChild(el);
+        }
+
         $('#slider').slider({
           range: false,
           value: -100,
           min: -400,
-          max: 500,
+          max: 1600,
           slide: function(event, ui) {
             var year = ui.value;
+            var this_year_idx = 0;
             for (var i = 0; i < rome.length; i++) {
-              if (rome[i][0] > year) break;
+              if (rome[i][0] > year) {
+                this_year_idx = i - 1;
+                break;
+              }
             }
-            i -= 1;
-            $("#rome").attr("d", rome[i][1]);
+
+            var cum_delta = {};
+            var sgn = this_year_idx - last_drawn_idx < 0 ? -1 : +1;
+            for (var i = last_drawn_idx + sgn; ; i += sgn) {
+              var data = rome[i][1];
+              for (var k in data) {
+                cum_delta[k] = data[k];
+              }
+              if (i == this_year_idx) break;
+            }
+
+            for (var k in cum_delta) {
+              var d = cum_delta[k];
+              if (d == '') d = 'M 11445 4535 z';
+              $('#' + k).attr("d", d);
+            }
+
             var str = year > 0 ? 'A.D.' : 'B.C.';
             $('#year').text('' + Math.abs(year) + ' ' + str);
           },
@@ -45,7 +91,15 @@
 
 <div style="position: absolute; top: 100px; left:50%; width: 800px; margin-left: -400px; border: 1px solid black;">
 <svg width=800 height=600 viewBox='11100 2750 4000 3000'>
-  <path id="rome" stroke=#F53F0C stroke-width=10 fill=#F5C60C stroke-linejoin=round d='M 11445 4535 S 11453 4557 11445 4535 11411 4456 11407 4424 11420 4396 11425 4377 11423 4345 11432 4329 11458 4301 11469 4298 11473 4315 11489 4314 11529 4300 11550 4294 11581 4300 11593 4287 11599 4247 11607 4228 11631 4207 11634 4192 11613 4167 11623 4152 11653 4124 11680 4117 11731 4125 11757 4118 11777 4085 11807 4082 11871 4106 11906 4103 11956 4082 11980 4068 11996 4025 12026 4033 12067 4116 12130 4104 12264 4021 12341 3977 12476 3906 12514 3882 12529 3865 12533 3856 12535 3859 12537 3832 12536 3741 12544 3721 12567 3731 12575 3732 12581 3726 12586 3725 12597 3732 12603 3729 12607 3717 12614 3713 12627 3712 12635 3711 12646 3709 12654 3705 12671 3696 12679 3690 12686 3681 12692 3678 12703 3677 12711 3675 12724 3667 12732 3667 12740 3674 12746 3677 12761 3683 12765 3685 12755 3685 12766 3684 12802 3681 12820 3683 12842 3688 12854 3697 12870 3709 12877 3728 12891 3777 12891 3792 12877 3796 12875 3803 12871 3819 12880 3829 12910 3841 12919 3852 12912 3872 12924 3881 12958 3889 12977 3896 13006 3905 13018 3917 13026 3946 13039 3955 13068 3961 13080 3963 13089 3959 13099 3966 13122 3988 13132 3997 13164 3996 13149 4012 13058 4016 13059 4074 13134 4257 13153 4303 13200 4264 13152 4304 12955 4445 12909 4501 12959 4566 12923 4582 12768 4602 12729 4583 12750 4521 12730 4486 12694 4437 12631 4409 12452 4349 12414 4347 12506 4388 12444 4399 12219 4388 12102 4401 11930 4431 11860 4463 11790 4542 11753 4561 11715 4562 11673 4557 11583 4541 11540 4538 11476 4539 11457 4539 11451 4537 11445 4535 z' />
+  <g id="ctry" stroke="#999999" stroke-width="1" stroke-miterlimit="1" stroke-linejoin="round" stroke-linecap="round">
+  <!--
+  <path id="Rome" stroke-width=10 fill=#F5C60C stroke-linejoin=round d='M 11445 4535 z' />
+  <path id="Byzantium" stroke-width=10 fill=#FFB7B7 stroke-linejoin=round d='M 11445 4535 z' />
+  <path id="Parthia" stroke-width=10 fill=#80FFFF stroke-linejoin=round d='M 11445 4535 z' />
+  <path id="Arabia" stroke-width=10 fill=#C4FFC4 stroke-linejoin=round d='M 11445 4535 z' />
+  <path id="Ottomans" stroke-width=10 fill=#F4D89B stroke-linejoin=round d='M 11445 4535 z' />
+  -->
+  </g>
 </svg>
 </div>
 
