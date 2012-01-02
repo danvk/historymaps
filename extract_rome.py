@@ -6,27 +6,21 @@ import re
 import json
 from collections import defaultdict
 
-first_year = -390
-last_year = 1600
-countries = {
-  'Rome': 'Rome',
-  'West Rome': 'Rome',
-  'East Rome': 'Byzantium',
-  'Byzantium': 'Byzantium',
-  'Parthia': 'Parthia',
-  'Arabia': 'Arabia',
-  'Turkey': 'Ottomans',
-  'Osman': 'Ottomans',
-  'Francia': 'HRE',
-  'East Francia': 'HRE',
-  'Persia': 'Persia'
-}
+num_countries = 1000
+end_year = 1600
 
 shapes = db.ShapesDb()
 
+countries = [c[0] for c in shapes.countries_by_span(limit_year=end_year)[:num_countries]]
+
+country_colors = defaultdict(str)  # name -> color string
+for name in countries:
+  country_colors[name] = shapes.color_for_country(name)
+
 country_shapes = {}  # name -> year -> shape
-for key, name in countries.iteritems():
-  key_shapes = shapes.shapes_for_country(key)
+
+for name in countries:
+  key_shapes = shapes.shapes_for_country(name)
   if name not in country_shapes:
     country_shapes[name] = {}
 
@@ -53,3 +47,6 @@ for year in sorted(hash_data.keys()):
 
 print 'var rome = ',
 print json.dumps(array_data, separators=(',',':'))
+
+print 'var colors = ',
+print json.dumps(country_colors, separators=(',',':'))

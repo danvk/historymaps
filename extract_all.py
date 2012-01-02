@@ -19,15 +19,16 @@ countries = [
 
 fs = whm.all_ordered_map_files()
 
-last_shapes = defaultdict(str)  # name -> shape string
+last_shape_colors = defaultdict(lambda: ("",""))  # name -> (shape, color) tuple
 
 conn, c = db.get_conn_cursor()
 
 for f in fs:
+  if whm.filename_to_year(f) < 1754: continue
   svg = whm.SvgFile(f)
   c.execute("delete from shapes where year=?", (svg.year(),))
 
-  this_year = defaultdict(str)
+  this_year = defaultdict(lambda: ("", ""))
   present = {}
 
   for name in svg.countries():
@@ -35,24 +36,34 @@ for f in fs:
     if not info: continue
     present[name] = True
 
-    shape = svg.shape_for_id(info['id'])
-    if not shape: continue  # might be an ellipse
+    path = svg.path_for_id(info['id'])
+    if not path: continue  # might be an ellipse
 
-    if shape != last_shapes[name]:
+    shape = path['d']
+    try:
+      color = path['fill']
+    except:
+      color = 'none'
+
+    shape_color = (shape, color)
+
+    if shape_color != last_shape_colors[name]:
       try:
-        this_year[name] = re.sub(r'\r|\n', '', shape)
-        last_shapes[name] = shape
+        this_year[name] = (re.sub(r'\r|\n', '', shape), color)
+        last_shape_colors[name] = shape_color
       except:
         assert False, '%d: %s' % (svg.year(), name)
 
-  for name in last_shapes.keys():
+  for name in last_shape_colors.keys():
     if name not in present:
-      this_year[name] = ''
-      del last_shapes[name]
+      this_year[name] = ('', '')
+      del last_shape_colors[name]
 
-  for name, shape in this_year.iteritems():
-    c.execute("""insert into shapes values (?, ?, ?)""",
-              (name, svg.year(), shape))
+  tuples = []
+  for name, shape_color in this_year.iteritems():
+    tuples.append((name, svg.year(), shape_color[0], shape_color[1]))
+
+  c.executemany("""insert into shapes values (?, ?, ?, ?)""", tuples)
   conn.commit()
 
   sys.stderr.write('%d...\n' % svg.year())
