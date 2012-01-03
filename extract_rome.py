@@ -7,7 +7,7 @@ import json
 from collections import defaultdict
 
 num_countries = 1000
-end_year = 1600
+end_year = 2010
 
 shapes = db.ShapesDb()
 

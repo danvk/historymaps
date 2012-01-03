@@ -6,17 +6,6 @@ import whm
 from collections import defaultdict
 import sys
 
-countries = [
-  'Rome',
-  'West Rome',
-  'East Rome',
-  'Byzantium',
-  'Parthia',
-  'Arabia',
-  'Turkey',
-  'Osman'
-]
-
 fs = whm.all_ordered_map_files()
 
 last_shape_colors = defaultdict(lambda: ("",""))  # name -> (shape, color) tuple
