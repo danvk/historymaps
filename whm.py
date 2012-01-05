@@ -189,11 +189,10 @@ class SvgFile(object):
     """
     return sorted(list(set([c['name'] for c in self._countries])))
 
-  def info_for_country(self, country):
-    """Returns a country dict or None"""
+  def infos_for_country(self, country):
+    """Returns a list of country dicts"""
     c = [c for c in self._countries if c['name'] == country]
-    if not c: return None
-    return c[0]
+    return c
 
   def path_for_id(self, country_id):
     """id is something from countries()[*]['id']"""
@@ -214,4 +213,8 @@ class SvgFile(object):
       print path
       return None
 
-
+  def combined_shape_for_country(self, name):
+    """Concatenates all paths for the country name."""
+    infos = self.infos_for_country(name)
+    shapes = [self.shape_for_id(info['id']) for info in infos]
+    return '\n'.join([shape for shape in shapes if shape])

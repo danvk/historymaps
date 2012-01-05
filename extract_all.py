@@ -13,7 +13,7 @@ last_shape_colors = defaultdict(lambda: ("",""))  # name -> (shape, color) tuple
 conn, c = db.get_conn_cursor()
 
 for f in fs:
-  if whm.filename_to_year(f) < 1754: continue
+  #if whm.filename_to_year(f) != 1549: continue
   svg = whm.SvgFile(f)
   c.execute("delete from shapes where year=?", (svg.year(),))
 
@@ -21,18 +21,19 @@ for f in fs:
   present = {}
 
   for name in svg.countries():
-    info = svg.info_for_country(name)
+    info = svg.infos_for_country(name)
     if not info: continue
+    info = info[0]
     present[name] = True
 
     path = svg.path_for_id(info['id'])
     if not path: continue  # might be an ellipse
 
-    shape = path['d']
     try:
       color = path['fill']
     except:
       color = 'none'
+    shape = svg.combined_shape_for_country(name)
 
     shape_color = (shape, color)
 

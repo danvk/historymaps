@@ -1,3 +1,19 @@
+1/5/12
+I kept throwing more and more data onto the demo page and it kept working
+perfectly. A few days ago, I put all the countries (~1000) onto the page. No
+problem! 
+
+I finally hit some kind of limit today. I generated a scaled-down overlay map
+of the full world (5040x3024, 2MB) and used background-position to show only a
+portion of it. The idea was to allow the full map to be panned. The 800x600 map
+worked great, but this giant map ground Chrome to a standstill. 
+
+The solution here is to use tiles. I can either roll my own tiling solution,
+use the Google Maps system or find some third party library. I suspect that
+building a panning, zooming, tiled map system is one of those things that seems
+simple until you sit down and try to implement it.
+
+
 12/30/11
 Using an inline SVG element and a transparent PNG overlay, I was able to make a
 nice slider demo of the Roman empire. This is really basic, but it's already
