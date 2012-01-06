@@ -2,7 +2,7 @@
   position: absolute;
   left: 0px;
   right: 200px;
-  top: 100px;
+  top: 80px;
   bottom: 1px;
 }
 
@@ -10,7 +10,7 @@
   position: absolute;
   left: 0px;
   right: 200px;
-  top: 100px;
+  top: 80px;
   bottom: 1px;
   pointer-events: none;
   border-top: 1px solid black;

@@ -85,6 +85,8 @@ $(function(){
     el.onmouseout = countryMouseOut;
     document.getElementById('ctry').appendChild(el);
   }
+
+  var scroll_amount = 0;
   $('#svg-holder').mousedown(function(e) {
     pressViewer(viewer, e);
     $(this).mousemove(function(e) {
@@ -96,7 +98,21 @@ $(function(){
   }).dblclick(function(e) {
     var mouse = localizeCoordinates(viewer, {'x': e.clientX, 'y': e.clientY});
     zoomImage(viewer, mouse, +1);
-  }).disableTextSelect();
+  }).disableTextSelect().mousewheel(function(e, delta) {
+    var old_amount = scroll_amount;
+    scroll_amount += delta;
+    if (Math.abs(scroll_amount) > 2.0) {
+      var mouse = localizeCoordinates(viewer, {'x': e.clientX, 'y': e.clientY});
+      var direction = (scroll_amount > 0 ? +1 : -1);
+      scroll_amount = 0;
+      zoomImage(viewer, mouse, direction);
+    }
+  });
+
+  // this prevents the "page bounce" effect in Safari/Chrome on Lion.
+  $(document).mousewheel(function(e) {
+    e.preventDefault();
+  });
 
   $('#slider').slider({
     range: false,
@@ -121,10 +137,8 @@ function makeSvgMatchImageViewer(xy) {
 
   var zoom = viewer.dimensions.zoomLevel;
   var zoomPow = Math.pow(2, zoom - 7);
-  x = x - (kExpandedBackgroundSize - kOriginalBackgroundWidth)/2 * zoomPow;
-  y = y - (kExpandedBackgroundSize - kOriginalBackgroundHeight)/2 * zoomPow;
-  x = -x;
-  y = -y;
+  x = (kExpandedBackgroundSize - kOriginalBackgroundWidth)/2 * zoomPow - x;
+  y = (kExpandedBackgroundSize - kOriginalBackgroundHeight)/2 * zoomPow - y;
 
   // These coordinates are in the original SVG space.
   // console.log('translate: ' + x + ', ' + y + '  scale: ' + zoomPow);

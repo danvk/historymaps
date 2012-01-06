@@ -397,7 +397,6 @@ function dumpAllInfo()
 function zoomImage(imageViewer, mouse, direction)
 {
     var dim = imageViewer.dimensions;
-    
     if(mouse == undefined) {
         var mouse = {'x': 0, 'y': 0};
     }
@@ -416,7 +415,7 @@ function zoomImage(imageViewer, mouse, direction)
                          '...mouse position is now '+pos.before.x+','+pos.before.y+' in the full image at zoom '+dim.zoomLevel,
                          '...with the corner at '+dim.x+','+dim.y];
 
-    if(dim.zoomLevel + direction >= 0) {
+    if(dim.zoomLevel + direction >= 0 && dim.zoomLevel + direction <= maxZoom) {
         pos.after = {'width': (pos.before.width * Math.pow(2, direction)), 'height': (pos.before.height * Math.pow(2, direction))};
         statusMessage.push('at zoom level '+(dim.zoomLevel + direction)+', image is '+pos.after.width+' pixels wide');
 

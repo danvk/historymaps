@@ -32,8 +32,15 @@ Low-hanging fruit to pick:
 x Generate a few more zoom levels (at least two)
 x Add double-click to zoom
 x Sort out the "pointer-events: none" business
-- Support scroll wheel zooming.
+x Support scroll wheel zooming.
 x Make the map window bigger than 800x600.
+
+
+More issues:
+- Figure out why the SVG & PNG don't always stay synced.
+- Make the "-" button zoom out from the center.
+- Make the country name appear near the mouse cursor.
+- Try out the double-slider idea.
 
 
 12/30/11
