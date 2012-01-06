@@ -124,7 +124,7 @@ function prepareViewer(imageViewer, tileDir, tileSize)
          // initial viewer position
          // defined as window-relative x,y coordinate of upper-left hand corner of complete image
          // usually negative. constant until zoomLevel changes
-         'x': center.x, 'y': center.y
+         'x': 0, 'y': 0
 
          };
 
@@ -382,7 +382,7 @@ function zoomImage(imageViewer, mouse, direction)
     var dim = imageViewer.dimensions;
     
     if(mouse == undefined) {
-        var mouse = {'x': dim.width / 2, 'y': dim.height / 2};
+        var mouse = {'x': 0, 'y': 0};
     }
 
     var pos = {'before': {'x': 0, 'y': 0}};
@@ -430,4 +430,13 @@ function zoomImageUp(imageViewer, mouse)
 function zoomImageDown(imageViewer, mouse)
 {
     zoomImage(imageViewer, mouse, -1);
+}
+
+function panAndZoomTo(imageViewer, x, y, zoom) {
+  var direction = zoom - imageViewer.dimensions.zoomLevel;
+  zoomImage(imageViewer, undefined, direction);
+
+  imageViewer.start = { x: 0, y: 0 };
+  var mouse = { x: -x, y: -y };
+  positionTiles(imageViewer, mouse);
 }

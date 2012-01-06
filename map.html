@@ -162,7 +162,9 @@ function updatePointerEvents(el) {
   <p class="status"></p>
 </div>
 <script type="text/javascript">
-  prepareViewer(document.getElementById("container"), 'tiles', 256);
+  var viewer = document.getElementById("container");
+  prepareViewer(viewer, 'tiles', 256);
+  panAndZoomTo(viewer, 2220 + (8192 - 5040)/2, 550 + (8192 - 3024)/2, 5);
 </script>
 
 <div id="buttons">
