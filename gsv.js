@@ -95,7 +95,7 @@ function prepareViewer(imageViewer, tileDir, tileSize)
         fullSize *= 2;
     } while(fullSize < Math.max(width, height));
 
-    var center = {'x': ((fullSize - width) / -2), 'y': ((fullSize - height) / -2)}; // top-left pixel of viewer, if it were to be centered in the view window
+    // var center = {'x': ((fullSize - width) / -2), 'y': ((fullSize - height) / -2)}; // top-left pixel of viewer, if it were to be centered in the view window
 
     imageViewer.style.width = width+'px';
     imageViewer.style.height = height+'px';
@@ -185,6 +185,8 @@ function positionTiles(imageViewer, mouse)
     var tiles = imageViewer.tiles;
     var dim = imageViewer.dimensions;
     var start = imageViewer.start;
+    var dx = mouse.x - start.x;
+    var dy = mouse.y - start.y;
     
     var statusTextLines = [];
     statusTextLines.push('imageViewer.dimensions x,y: '+dim.x+','+dim.y);
@@ -197,15 +199,15 @@ function positionTiles(imageViewer, mouse)
             // wrappedAround will become true if any tile has to be wrapped around
             var wrappedAround = false;
             
-            tile.x = (tile.c * dim.tileSize) + dim.x + (mouse.x - start.x);
-            tile.y = (tile.r * dim.tileSize) + dim.y + (mouse.y - start.y);
+            tile.x = (tile.c * dim.tileSize) + dim.x + dx;
+            tile.y = (tile.r * dim.tileSize) + dim.y + dy;
             
             if(tile.x > dim.width) {
                 // tile is too far to the right
                 // shift it to the far-left until it's within the viewer window
                 do {
                     tile.c -= tiles.length;
-                    tile.x = (tile.c * dim.tileSize) + dim.x + (mouse.x - start.x);
+                    tile.x = (tile.c * dim.tileSize) + dim.x + dx;
                     wrappedAround = true;
 
                 } while(tile.x > dim.width);
@@ -215,7 +217,7 @@ function positionTiles(imageViewer, mouse)
                 // if it is, shift it to the far-right until it's within the viewer window
                 while(tile.x < (-1 * dim.tileSize)) {
                     tile.c += tiles.length;
-                    tile.x = (tile.c * dim.tileSize) + dim.x + (mouse.x - start.x);
+                    tile.x = (tile.c * dim.tileSize) + dim.x + dx;
                     wrappedAround = true;
 
                 }
@@ -226,7 +228,7 @@ function positionTiles(imageViewer, mouse)
                 // shift it to the very top until it's within the viewer window
                 do {
                     tile.r -= tiles[c].length;
-                    tile.y = (tile.r * dim.tileSize) + dim.y + (mouse.y - start.y);
+                    tile.y = (tile.r * dim.tileSize) + dim.y + dy;
                     wrappedAround = true;
 
                 } while(tile.y > dim.height);
@@ -236,7 +238,7 @@ function positionTiles(imageViewer, mouse)
                 // if it is, shift it to the very bottom until it's within the viewer window
                 while(tile.y < (-1 * dim.tileSize)) {
                     tile.r += tiles[c].length;
-                    tile.y = (tile.r * dim.tileSize) + dim.y + (mouse.y - start.y);
+                    tile.y = (tile.r * dim.tileSize) + dim.y + dy;
                     wrappedAround = true;
 
                 }
@@ -289,6 +291,18 @@ function setTileImage(tile, nullOverride)
     tile.img.src = src;
 }
 
+function callMovedTiles(imageViewer, mouse) {
+    if (imageViewer.movedTiles !== undefined) {
+      var dim = imageViewer.dimensions;
+      var start = imageViewer.start;
+      var currentPos = {
+        x: dim.x + (mouse.x - start.x),
+        y: dim.y + (mouse.y - start.y)
+      };
+      imageViewer.movedTiles(currentPos);
+    }
+}
+
 function moveViewer(event)
 {
     var imageViewer = this.imageViewer;
@@ -297,6 +311,8 @@ function moveViewer(event)
 
     displayStatus(imageViewer, 'mouse at: '+mouse.x+', '+mouse.y+', '+(imageViewer.tiles.length * imageViewer.tiles[0].length)+' tiles to process');
     positionTiles(imageViewer, {'x': mouse.x, 'y': mouse.y});
+
+    callMovedTiles(imageViewer, mouse);
 }
 
 function localizeCoordinates(imageViewer, client)
@@ -346,6 +362,9 @@ function releaseViewer(event)
         }
 
         displayStatus(imageViewer, 'mouse dragged from '+imageViewer.start.x+', '+imageViewer.start.y+' to '+mouse.x+','+mouse.y+'. image: '+dim.x+','+dim.y);
+
+        imageViewer.start = {x: mouse.x, y: mouse.y};
+        callMovedTiles(imageViewer, mouse);
     }
 }
 
@@ -439,4 +458,7 @@ function panAndZoomTo(imageViewer, x, y, zoom) {
   imageViewer.start = { x: 0, y: 0 };
   var mouse = { x: -x, y: -y };
   positionTiles(imageViewer, mouse);
+  var dim = imageViewer.dimensions;
+  dim.x = -x;
+  dim.y = -y;
 }

@@ -136,6 +136,18 @@ function updatePointerEvents(el) {
     $('.imageViewer').css('pointer-events', 'auto');
   }
 }
+
+function makeSvgMatchImageViewer(xy) {
+  // These coordinates are in the original SVG space.
+  var x = xy.x, y = xy.y;
+  x = -x - (8192 - 5040)/2;
+  y = -y - (8192 - 3024)/2;
+  x *= 5;
+  y *= 5;
+  x = 11100 - x;
+  y = 2750 - y;
+  $("#ctry").attr("transform", "translate(" + x + "," + y + ")");
+}
   </script>
 </head>
 <body>
@@ -149,7 +161,7 @@ function updatePointerEvents(el) {
 <div id="highlighted-country" style="position: absolute; top: 150px; left: 20px; width: 200px; font-weight: bold;"></div>
 
 <div id="svg-holder">
-<svg width=800 height=600 viewBox='11100 2750 4000 3000'>
+<svg id="svg-el" width=800 height=600 viewBox='11100 2750 4000 3000'>
   <g id="ctry" stroke="#999999" stroke-width="1" stroke-miterlimit="1" stroke-linejoin="round" stroke-linecap="round">
 
   </g>
@@ -165,6 +177,8 @@ function updatePointerEvents(el) {
   var viewer = document.getElementById("container");
   prepareViewer(viewer, 'tiles', 256);
   panAndZoomTo(viewer, 2220 + (8192 - 5040)/2, 550 + (8192 - 3024)/2, 5);
+
+  viewer.movedTiles = makeSvgMatchImageViewer;
 </script>
 
 <div id="buttons">
