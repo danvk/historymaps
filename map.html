@@ -138,15 +138,20 @@ function updatePointerEvents(el) {
 }
 
 function makeSvgMatchImageViewer(xy) {
-  // These coordinates are in the original SVG space.
+  // These coords are relative to the top-left corner of the un-tiled overlay.
   var x = xy.x, y = xy.y;
-  x = -x - (8192 - 5040)/2;
-  y = -y - (8192 - 3024)/2;
+
+  var zoom = viewer.dimensions.zoomLevel;
+  var zoomPow = Math.pow(2, zoom - 5);
+  x = x - (8192 - 5040)/2 * zoomPow;
+  y = y - (8192 - 3024)/2 * zoomPow;
   x *= 5;
   y *= 5;
   x = 11100 - x;
   y = 2750 - y;
-  $("#ctry").attr("transform", "translate(" + x + "," + y + ")");
+
+  // These coordinates are in the original SVG space.
+  $("#ctry").attr("transform", "translate(" + x + "," + y + ") scale(" + zoomPow + ")");
 }
   </script>
 </head>

@@ -292,15 +292,15 @@ function setTileImage(tile, nullOverride)
 }
 
 function callMovedTiles(imageViewer, mouse) {
-    if (imageViewer.movedTiles !== undefined) {
-      var dim = imageViewer.dimensions;
-      var start = imageViewer.start;
-      var currentPos = {
-        x: dim.x + (mouse.x - start.x),
-        y: dim.y + (mouse.y - start.y)
-      };
-      imageViewer.movedTiles(currentPos);
-    }
+  if (imageViewer.movedTiles !== undefined) {
+    var dim = imageViewer.dimensions;
+    var start = imageViewer.start;
+    var currentPos = {
+      x: -(dim.x + (mouse.x - start.x)),
+      y: -(dim.y + (mouse.y - start.y))
+    };
+    imageViewer.movedTiles(currentPos);
+  }
 }
 
 function moveViewer(event)
@@ -439,6 +439,7 @@ function zoomImage(imageViewer, mouse, direction)
     }
 
     displayStatus(imageViewer, statusMessage.join('<br>'));
+    callMovedTiles(imageViewer, mouse);
 }
 
 function zoomImageUp(imageViewer, mouse)
