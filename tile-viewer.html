@@ -1,0 +1,28 @@
+<html>
+  <head>
+    <title>GSV test</title>
+    <script type="text/javascript" src="tiles/gsv.js"></script>
+    <link rel="stylesheet" href="map.css" type="text/css" />
+  </head>
+  <body>
+
+    <div class="imageViewer" id="container">
+      <div class="well"></div>
+      <div class="surface"></div>
+      <p class="status"></p>
+    </div>
+
+    <div style="position: absolute; top: 650px; left: 10px;">
+    <button
+      onClick="zoomImageUp(document.getElementById('container'))">+</button>
+    &nbsp;
+    <button
+      onClick="zoomImageDown(document.getElementById('container'))">-</button>
+    </div>
+
+    <script type="text/javascript">
+      prepareViewer(document.getElementById("container"), 'tiles', 256);
+    </script>
+
+  </body>
+</html>
