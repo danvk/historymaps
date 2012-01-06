@@ -303,9 +303,8 @@ function callMovedTiles(imageViewer, mouse) {
   }
 }
 
-function moveViewer(event)
+function moveViewer(imageViewer, event)
 {
-    var imageViewer = this.imageViewer;
     var ev = getEvent(event);
     var mouse = localizeCoordinates(imageViewer, {'x': ev.clientX, 'y': ev.clientY});
 
@@ -327,9 +326,8 @@ function localizeCoordinates(imageViewer, client)
     return local;
 }
 
-function pressViewer(event)
+function pressViewer(imageViewer, event)
 {
-    var imageViewer = this.imageViewer;
     var dim = imageViewer.dimensions;
     var ev = getEvent(event);
     var mouse = localizeCoordinates(imageViewer, {'x': ev.clientX, 'y': ev.clientY});
@@ -338,7 +336,7 @@ function pressViewer(event)
     imageViewer.tileWell.style.cursor = imageViewer.activeSurface.style.cursor = 'move';
     
     imageViewer.start = {'x': mouse.x, 'y': mouse.y};
-    this.onmousemove = moveViewer;
+    // this.onmousemove = moveViewer;
 
     displayStatus(imageViewer, 'mouse pressed at '+mouse.x+','+mouse.y);
 }
@@ -353,7 +351,7 @@ function releaseViewer(event)
         var dim = imageViewer.dimensions;
 
         if(imageViewer.pressed) {
-            imageViewer.activeSurface.onmousemove = null;
+            // imageViewer.activeSurface.onmousemove = null;
             imageViewer.tileWell.style.cursor = imageViewer.activeSurface.style.cursor = 'default';
             imageViewer.pressed = false;
 

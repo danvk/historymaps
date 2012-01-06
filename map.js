@@ -72,6 +72,18 @@ $(function(){
     el.onmouseout = countryMouseOut;
     document.getElementById('ctry').appendChild(el);
   }
+  $('#svg-holder').mousedown(function(e) {
+    console.log('down');
+    pressViewer(viewer, e);
+    $(this).mousemove(function(e) {
+      moveViewer(viewer, e);
+      console.log('move');
+    }).mouseup(function(e) {
+      releaseViewer(e);
+      console.log('up');
+      $(this).off('mousemove').off('mouseup');
+    });
+  });
 
   $('#slider').slider({
     range: false,
@@ -89,14 +101,6 @@ $(function(){
   slideToYear(-100);
 });
 
-function updatePointerEvents(el) {
-  if (el.checked) {
-    $('.imageViewer').css('pointer-events', 'none');
-  } else {
-    $('.imageViewer').css('pointer-events', 'auto');
-  }
-}
-
 function makeSvgMatchImageViewer(xy) {
   // These coords are relative to the top-left corner of the un-tiled overlay.
   var x = xy.x, y = xy.y;
@@ -108,10 +112,6 @@ function makeSvgMatchImageViewer(xy) {
   y = y - (kExpandedBackgroundSize - kOriginalBackgroundHeight)/2 * zoomPow;
   x = -x;
   y = -y;
-  // x *= 5;
-  // y *= 5;
-  // x = startX - x;
-  // y = startY - y;
 
   // These coordinates are in the original SVG space.
   // console.log('translate: ' + x + ', ' + y + '  scale: ' + zoomPow);
