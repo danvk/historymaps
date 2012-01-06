@@ -453,6 +453,7 @@ function zoomImageDown(imageViewer, mouse)
 }
 
 function panAndZoomTo(imageViewer, x, y, zoom) {
+  // console.log(x, y, zoom);
   var direction = zoom - imageViewer.dimensions.zoomLevel;
   zoomImage(imageViewer, undefined, direction);
 
