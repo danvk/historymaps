@@ -58,6 +58,19 @@ function slideToYear(year) {
 }
 
 $(function(){
+  // From http://stackoverflow.com/questions/2132172/disable-text-highlighting-on-double-click-in-jquery
+  $.extend($.fn.disableTextSelect = function() {
+    return this.each(function(){
+      if ($.browser.mozilla) {  //Firefox
+        $(this).css('MozUserSelect','none');
+      } else if ($.browser.msie) {  //IE
+        $(this).bind('selectstart',function(){return false;});
+      } else {  //Opera, etc.
+        $(this).mousedown(function(){return false;});
+      }
+    });
+  });
+
   // create paths for all empires/nations
   for (var k in colors) {
     var el = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -73,17 +86,17 @@ $(function(){
     document.getElementById('ctry').appendChild(el);
   }
   $('#svg-holder').mousedown(function(e) {
-    console.log('down');
     pressViewer(viewer, e);
     $(this).mousemove(function(e) {
       moveViewer(viewer, e);
-      console.log('move');
     }).mouseup(function(e) {
       releaseViewer(e);
-      console.log('up');
       $(this).off('mousemove').off('mouseup');
     });
-  });
+  }).dblclick(function(e) {
+    var mouse = localizeCoordinates(viewer, {'x': e.clientX, 'y': e.clientY});
+    zoomImage(viewer, mouse, +1);
+  }).disableTextSelect();
 
   $('#slider').slider({
     range: false,

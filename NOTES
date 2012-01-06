@@ -30,7 +30,7 @@ Now that zooming and panning are working, this is HOT!
 
 Low-hanging fruit to pick:
 x Generate a few more zoom levels (at least two)
-- Add double-click to zoom
+x Add double-click to zoom
 x Sort out the "pointer-events: none" business
 - Support scroll wheel zooming.
 x Make the map window bigger than 800x600.
