@@ -351,6 +351,7 @@ function releaseViewer(event)
         var dim = imageViewer.dimensions;
 
         if(imageViewer.pressed) {
+            positionTiles(imageViewer, mouse);
             // imageViewer.activeSurface.onmousemove = null;
             imageViewer.tileWell.style.cursor = imageViewer.activeSurface.style.cursor = 'default';
             imageViewer.pressed = false;
