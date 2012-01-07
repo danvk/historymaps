@@ -25,20 +25,15 @@
   height: 14px;
 }
 
-#buttons {
+#side-panel {
   position: absolute;
-  top: 150px;
+  top: 80px;
   right: 20px;
   width: 170px;
   margin-left: -170px;
 }
 
 #highlighted-country {
-  position: absolute;
-  top: 100px;
-  right: 20px;
-  width: 170px;
-  margin-left: -170px;
   font-weight: bold;
 }
 

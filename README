@@ -1,3 +1,27 @@
 Creating interactive historical maps of the world.
 
-Not much to show (yet!).
+
+To run the viewer demo:
+
+- Install necessary libraries, e.g.
+  sudo port install py27-sqlite
+  sudo port install py27-pil
+  sudo port install ImageMagick
+
+- Copy over the WHM SVG files into the appropriate dir.
+
+- Build the sqlite DB:
+  ./extract_all.py
+
+- Convert to JSON:
+  ./extract_rome.py > several_countries.js
+
+- Create image tiles:
+  convert worldhistorymaps/html/Wgeo.svg -transparent white rome-bg.png
+  ./tiler/subdiv.py rome-bg.png
+
+  Note the size of the expanded image and the original (un-tiled) image size in
+  map.js.
+
+- Load the map:
+  historymaps/map.html

@@ -1,3 +1,42 @@
+1/6/12
+The map/slider UI is mostly good at this point.
+
+I want to focus on the data again, starting by bringing in battles from
+Wikipedia. These are articles with "{{Infobox military conflict...}}", which
+may contain both a date and a location, e.g.
+
+{{Infobox military conflict
+| date = 1897
+| latitude = 37.1
+| longitude = -89.2
+}}
+
+These could become little markers on the map.
+
+There are only ~500 of these, unfortunately. Most battles do not have
+coordinates. Many more of them have a city name.
+
+I'm at an interesting point now -- I'm getting diminishing returns on the SVG
+data & viewer. It's progressed _way_ farther than I would have imagined
+possible a month ago, but it's still running out of steam.
+
+Directions to go next:
+
+- Make a "pitch deck" for the whole project & send it to a few people, e.g.
+  bradvertising.
+
+- Expand the circle of people I'm getting feedback from. I'd like to pitch this
+  to a few product folks, e.g. Dave Hammer and Chris Pedregal.
+
+- Talk to Alfred Spector about the possibility of doing this @ Google (Craig
+  N-M has indicated that he's interested in adding a time dimension to our
+  products).
+
+- Work on other tools which are less developed. This includes the map rectifier
+  and the map editor.
+
+
+
 1/5/12
 I kept throwing more and more data onto the demo page and it kept working
 perfectly. A few days ago, I put all the countries (~1000) onto the page. No
@@ -37,8 +76,8 @@ x Make the map window bigger than 800x600.
 
 
 More issues:
-- Figure out why the SVG & PNG don't always stay synced.
-- Make the "-" button zoom out from the center.
+x Figure out why the SVG & PNG don't always stay synced.
+/ Make the "-" button zoom out from the center.
 - Make the country name appear near the mouse cursor.
 - Try out the double-slider idea.
 

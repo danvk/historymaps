@@ -1,5 +1,5 @@
 var min = -400;
-var max = end_year;
+var max = end_year;  // comes from several_countries.js
 var kExpandedBackgroundSize = 32768;
 var kOriginalBackgroundWidth = 25201;
 var kOriginalBackgroundHeight = 15120;
@@ -8,7 +8,7 @@ var kOriginalBackgroundHeight = 15120;
 var startX = 12100;
 var startY = 3550;
 var startZoom = 5;
-var maxZoom = 7;
+var maxZoom = Math.log(kExpandedBackgroundSize / 256) / Math.log(2);
 
 function nameToId(name) {
   return name.replace(/ /g, '_');
@@ -33,12 +33,18 @@ function slideToYear(year) {
     }
   }
 
+  // XXX This logic is correct for moving forward, but not backwards.
+  // If a country disappears when you go forward one year, this will not make
+  // it reappear when you move back one year.
+  // Additionally, there are off-by-one errors going forward/backward.
   var cum_delta = {};
   var sgn = this_year_idx - last_drawn_idx < 0 ? -1 : +1;
-  for (var i = last_drawn_idx + sgn; ; i += sgn) {
-    var data = rome[i][1];
-    for (var k in data) {
-      cum_delta[k] = data[k];
+  for (var i = last_drawn_idx; ; i += sgn) {
+    if (rome[i] !== undefined) {
+      var data = rome[i][1];
+      for (var k in data) {
+        cum_delta[k] = data[k];
+      }
     }
     if (i == this_year_idx) break;
   }
@@ -89,7 +95,7 @@ $(function(){
   var scroll_amount = 0;
   $('#svg-holder').mousedown(function(e) {
     pressViewer(viewer, e);
-    $(this).mousemove(function(e) {
+    $(document).mousemove(function(e) {
       moveViewer(viewer, e);
     }).mouseup(function(e) {
       releaseViewer(e);
