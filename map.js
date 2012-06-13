@@ -15,7 +15,10 @@ function nameToId(name) {
 }
 
 function countryMouseOver(e) {
+  var x = e.pageX, y = e.pageY;
   $('#highlighted-country').html(e.target.getAttribute('readableName'));
+  $('#highlighted-country').offset({ top: y + 20, left: x - 50 })
+  
   e.target.setAttribute('stroke-width', 20);
 }
 function countryMouseOut(e) {
@@ -93,27 +96,31 @@ $(function(){
   }
 
   var scroll_amount = 0;
-  $('#svg-holder').mousedown(function(e) {
-    pressViewer(viewer, e);
-    $(document).mousemove(function(e) {
-      moveViewer(viewer, e);
-    }).mouseup(function(e) {
-      releaseViewer(e);
-      $(this).off('mousemove').off('mouseup');
-    });
-  }).dblclick(function(e) {
-    var mouse = localizeCoordinates(viewer, {'x': e.clientX, 'y': e.clientY});
-    zoomImage(viewer, mouse, +1);
-  }).disableTextSelect().mousewheel(function(e, delta) {
-    var old_amount = scroll_amount;
-    scroll_amount += delta;
-    if (Math.abs(scroll_amount) > 2.0) {
+  $('#svg-holder')
+    .mousedown(function(e) {
+      pressViewer(viewer, e);
+      $(document).mousemove(function(e) {
+        moveViewer(viewer, e);
+      }).mouseup(function(e) {
+        releaseViewer(e);
+        $(this).off('mousemove').off('mouseup');
+      });
+    })
+    .dblclick(function(e) {
       var mouse = localizeCoordinates(viewer, {'x': e.clientX, 'y': e.clientY});
-      var direction = (scroll_amount > 0 ? +1 : -1);
-      scroll_amount = 0;
-      zoomImage(viewer, mouse, direction);
-    }
-  });
+      zoomImage(viewer, mouse, +1);
+    })
+    .disableTextSelect()
+    .mousewheel(function(e, delta) {
+      var old_amount = scroll_amount;
+      scroll_amount += delta;
+      if (Math.abs(scroll_amount) > 2.0) {
+        var mouse = localizeCoordinates(viewer, {'x': e.clientX, 'y': e.clientY});
+        var direction = (scroll_amount > 0 ? +1 : -1);
+        scroll_amount = 0;
+        zoomImage(viewer, mouse, direction);
+      }
+    });
 
   // this prevents the "page bounce" effect in Safari/Chrome on Lion.
   $(document).mousewheel(function(e) {

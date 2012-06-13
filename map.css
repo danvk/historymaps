@@ -1,15 +1,17 @@
 #svg-holder {
   position: absolute;
   left: 0px;
-  right: 200px;
+  right: 0px;
   top: 80px;
   bottom: 1px;
+  /* background-color: #EAEFDE; */
+  background-color: #F7FAEB;
 }
 
 .imageViewer {
   position: absolute;
   left: 0px;
-  right: 200px;
+  right: 0px;
   top: 80px;
   bottom: 1px;
   pointer-events: none;
@@ -34,7 +36,17 @@
 }
 
 #highlighted-country {
-  font-weight: bold;
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  position: absolute;
+  font-size: xx-large;
+  color: black;
+  /*
+  -webkit-text-stroke: 1.0px white;
+  -webkit-text-fill-color: black;
+  */
+  text-shadow: 0px 0px 10px gray;
+  -webkit-text-shadow: 0px 0px 10px gray;
+  pointer-events: none;
 }
 
 .imageViewer .well, .imageViewer .surface {
@@ -72,4 +84,9 @@
   top: 0px;
   left: 0px;
   display: block;
+}
+
+#year {
+  font-size: large;
+  font-weight: bold;
 }
