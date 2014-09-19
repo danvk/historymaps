@@ -1,5 +1,5 @@
-var min = -400;
-var max = end_year;  // comes from several_countries.js
+var min = 1783;
+var max = 1999;  // comes from several_countries.js
 var kExpandedBackgroundSize = 32768;
 var kOriginalBackgroundWidth = 25201;
 var kOriginalBackgroundHeight = 15120;
@@ -32,14 +32,28 @@ function countryMouseOver(e) {
     left: 0.5 * (r.left + r.right)
   });
   
-  e.target.setAttribute('stroke-width', 20);
+  e.target.setAttribute('stroke-width', 0.1);
 }
 function countryMouseOut(e) {
   $('#highlighted-country').html('');
-  e.target.setAttribute('stroke-width', 5);
+  e.target.setAttribute('stroke-width', 0.05);
 }
 
 var last_drawn_idx = -1;
+var shape_indices = {};  // name -> year index currently being displayed.
+
+var shape_to_year_idx_map = {};
+for (var i = 0; i < rome.length; i++) {
+  var data = rome[i][1];
+  for (var k in data) {
+    if (!(k in shape_to_year_idx_map)) {
+      shape_to_year_idx_map[k] = [i];
+    } else {
+      shape_to_year_idx_map[k].push(i);
+    }
+  }
+}
+
 function slideToYear(year) {
   var this_year_idx = 0;
   for (var i = 0; i < rome.length; i++) {
@@ -48,6 +62,7 @@ function slideToYear(year) {
       break;
     }
   }
+  // console.log('slideToYear(' + year + '): ' + last_drawn_idx + ' -> ' + this_year_idx);
 
   // XXX This logic is correct for moving forward, but not backwards.
   // If a country disappears when you go forward one year, this will not make
@@ -55,15 +70,33 @@ function slideToYear(year) {
   // Additionally, there are off-by-one errors going forward/backward.
   var cum_delta = {};
   var sgn = this_year_idx - last_drawn_idx < 0 ? -1 : +1;
-  for (var i = last_drawn_idx; ; i += sgn) {
-    if (rome[i] !== undefined) {
+  if (this_year_idx > last_drawn_idx) {
+    // Move year forward.
+    for (var i = last_drawn_idx; i <= this_year_idx; i++) {
+      if (rome[i] === undefined) continue;
       var data = rome[i][1];
       for (var k in data) {
         cum_delta[k] = data[k];
+        shape_indices[k] = i;
       }
     }
-    if (i == this_year_idx) break;
+  } else {
+    // Move year backward.
+    for (var k in shape_indices) {
+      // console.log(k + ' -> ' + shape_indices[k] + ' (' + rome[shape_indices[k]][0] + ')');
+      if (shape_indices[k] > this_year_idx) {
+        var indices = shape_to_year_idx_map[k];
+        var cur_idx = indices.indexOf(shape_indices[k]);
+        if (cur_idx <= 0) throw "ick!";
+        
+        while (indices[cur_idx] > this_year_idx) cur_idx--;
+        var new_idx = indices[cur_idx];
+        shape_indices[k] = new_idx;
+        cum_delta[k] = rome[new_idx][1][k];
+      }
+    }
   }
+
   last_drawn_idx = this_year_idx;
 
   for (var k in cum_delta) {
@@ -77,6 +110,50 @@ function slideToYear(year) {
   $('#year')
       .text('' + Math.abs(year) + ' ' + str)
       .css('left', pct + '%');
+}
+
+// Collects all currently-visible paths into a dict.
+// Useful for testing.
+function collectPaths() {
+  var paths = {};
+  for (var k in colors) {
+    var d = $('#' + nameToId(k)).attr("d");
+    if (d && d != "M 11445 4535 z") {
+      paths[k] = d;
+    }
+  }
+  return paths;
+}
+
+function areDictsEqual(a, b) {
+  for (var k in a) {
+    if (!(k in b)) return false;
+    if (a[k] != b[k]) return false;
+  }
+  for (var k in b) {
+    if (!(k in a)) return false;
+  }
+  return true;
+}
+
+function test() {
+  var init1783 = collectPaths();
+  // slideToYear(1800);
+  // var init1800 = collectPaths();
+  slideToYear(1810);
+  // slideToYear(1800);
+  // var final1800 = collectPaths();
+  slideToYear(1783);
+  var final1783 = collectPaths();
+  console.log(init1783);
+  console.log(final1783);
+  if (!areDictsEqual(init1783, final1783)
+     // || !areDictsEqual(init1800, final1800)
+      ) {
+    throw "Error";
+  } else {
+    console.log("good to go!");
+  }
 }
 
 $(function(){
@@ -93,63 +170,36 @@ $(function(){
     });
   });
 
-  var setAttrs = function(el, obj) {
-    $.each(obj, function(k, v) {
-      el.setAttribute(k, v);
-    });
-  };
-
-  var $svgHolder = $('#svg-holder');
-  var svgNS = "http://www.w3.org/2000/svg";
-  var svg = document.createElementNS(svgNS, "svg");
-  setAttrs(svg, {
-    "id": "svg-el",
-    "width": $svgHolder.width(),
-    "height": $svgHolder.height()
-  });
-  var ctryG = document.createElementNS(svgNS, "g");
-  setAttrs(ctryG, {
-    'id': 'ctry',
-    'stroke': '#999999',
-    'stroke-width': '1',
-    'stroke-miterlimit': '1',
-    'stroke-linejoin': 'round',
-    'stroke-linecap': 'round'
-  });
-
-  svg.appendChild(ctryG);
-  $svgHolder.append(svg);
-
   // create paths for all empires/nations
   for (var k in colors) {
     var el = document.createElementNS("http://www.w3.org/2000/svg", "path");
     el.id = nameToId(k);
     el.setAttribute('readableName', k);
-    el.setAttribute('stroke-width', 5);
+    el.setAttribute('stroke-width', 0.05);
     el.setAttribute('fill', colors[k]);
     el.setAttribute('stroke-linejoin', 'round');
     el.setAttribute('d', 'M 11445 4535 z');
     // TODO(danvk): use jquery SVG to do this?
     el.onmouseover = countryMouseOver;
     el.onmouseout = countryMouseOut;
-    ctryG.appendChild(el);
+    document.getElementById('ctry').appendChild(el);
   }
 
   var scroll_amount = 0;
   $('#svg-holder')
     .mousedown(function(e) {
-      pressViewer(viewer, e);
+      // pressViewer(viewer, e);
       $(document).mousemove(function(e) {
-        moveViewer(viewer, e);
+        // moveViewer(viewer, e);
       }).mouseup(function(e) {
-        releaseViewer(e);
+        // releaseViewer(e);
         $(this).off('mousemove').off('mouseup');
       });
     })
-    .dblclick(function(e) {
-      var mouse = localizeCoordinates(viewer, {'x': e.clientX, 'y': e.clientY});
-      zoomImage(viewer, mouse, +1);
-    })
+    // .dblclick(function(e) {
+    //   var mouse = localizeCoordinates(viewer, {'x': e.clientX, 'y': e.clientY});
+    //   zoomImage(viewer, mouse, +1);
+    // })
     .disableTextSelect()
     .mousewheel(function(e, delta) {
       var old_amount = scroll_amount;
@@ -169,9 +219,9 @@ $(function(){
 
   $('#slider').slider({
     range: false,
-    value: -100,
+    value: 1783,
     min: min,
-    max: end_year,
+    max: 1999,
     slide: function(e, ui) {
       slideToYear(ui.value);
     }
@@ -180,23 +230,8 @@ $(function(){
     // }
   });
 
-  slideToYear(-100);
+  slideToYear(1783);
 });
-
-function makeSvgMatchImageViewer(xy) {
-  // These coords are relative to the top-left corner of the un-tiled overlay.
-  var x = xy.x, y = xy.y;
-  // console.log(x, y);
-
-  var zoom = viewer.dimensions.zoomLevel;
-  var zoomPow = Math.pow(2, zoom - 7);
-  x = (kExpandedBackgroundSize - kOriginalBackgroundWidth)/2 * zoomPow - x;
-  y = (kExpandedBackgroundSize - kOriginalBackgroundHeight)/2 * zoomPow - y;
-
-  // These coordinates are in the original SVG space.
-  // console.log('translate: ' + x + ', ' + y + '  scale: ' + zoomPow);
-  $("#ctry").attr("transform", "translate(" + x + "," + y + ") scale(" + zoomPow + ")");
-}
 
 // Compute the center of mass of an SVG <path> element.
 // This approximates the path with a 10,000-sided polygon.

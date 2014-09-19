@@ -1,3 +1,44 @@
+6/24/12
+
+I'd like to combine the worldhistorymaps.com data with the U.S. States data
+from Newberry (http://publications.newberry.org/ahcbp/pages/United_States.html).
+
+The WHM.com data is projected while the Newberry data consists of lat/lons.
+Rectifying them requires figuring out the exact projection used by WHM.
+
+Some background on WHM:
+http://www.worldhistorymaps.com/description.html
+The maps were created by John C. Nelson, a historian who worked as a computer
+programmer at the Bureau of Engraving and Printing for 25 years. To build this
+data, he wrote some custom software: "All maps were generated directly from the
+GIS using custom programs written in Visual Basic."
+
+He lists many of his sources here:
+http://www.worldhistorymaps.com/sources.html
+
+While I couldn't find an explicit mention of what the projection was anywhere,
+I did find this quote:
+"The custom maps will be drawn using the map projection of your choice. The
+following projections are available. There are no additional charges for
+different projections.
+o No projection
+o Winkel-Tripel (used by National Geographic)
+o Mollweide
+o Eckert equal area
+o Orthographic"
+
+That implies that the SVG data uses one of these four projections.
++ Winkel-Tripel: definitely a possibility!
+  Mollweide: NO. This projection has no flat edge at the top.
++ Eckert equal area: I believe this is Eckert VI, which is a possibility.
+  Orthographic: definitely not, this does not include whole world
+
+He also refers to a 1971 article in the Annals of the Association of American
+Geographers which sparked the idea. I haven't been able to find this article.
+
+
+--------------------
+
 1/6/12
 The map/slider UI is mostly good at this point.
 

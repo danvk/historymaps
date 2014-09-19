@@ -1,0 +1,44 @@
+<html>
+<head>
+<title>U.S. States over Time</title>
+  <script type="text/javascript" src="states.js"></script>
+  <!--
+  <script type="text/javascript" src="fake-data.js"></script>
+  -->
+  <link type="text/css" href="jquery/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
+  <link rel="stylesheet" href="map.css" type="text/css" />
+  <style type="text/css">
+  #slider {
+    left: 80px;
+    right: 80px;
+  }
+  </style>
+
+  <script src="jquery/jquery-1.7.1.min.js" type="text/javascript"></script>
+  <script src="jquery/jquery-ui-1.8.14.custom.min.js" type="text/javascript"></script>
+  <script src="jquery/jquery.mousewheel.min.js" type="text/javascript"></script>
+  <script src="states-map.js" type="text/javascript"></script>
+</head>
+<body>
+
+<div id="slider"></div>
+
+<div style="position: absolute; left: 80px; top: 40px; right: 80px; height: 40px;">
+  <div id="year" style="position: absolute; left: 80px; width: 200px; margin-left: -100px; text-align: center;">1783</div>
+</div>
+
+<!-- svg tags cannot be absolutely positioned, hence the holder -->
+<div id="svg-holder">
+<svg id="svg-el" viewBox="-45 -30 90 60">
+  <g id="ctry" stroke="#999999" stroke-width="1" stroke-miterlimit="1" stroke-linejoin="round" stroke-linecap="round">
+  </g>
+</svg>
+</div>
+
+<script type="text/javascript">
+</script>
+
+<div id="highlighted-country"></div>
+
+</body>
+</html>
