@@ -23,7 +23,7 @@ y: 9737, x: 14903
 -25.682104, 45.221032
 
 SW tip of Africa's gold coast:
-y: 7209, x: 1129
+y: 7197, x: 11305
 4.274316, -7.521580
 
 Southern tip of Argentina:
@@ -65,3 +65,11 @@ y: 2041, x: 10835
 Base of Lake Victoria inlet:
 y: 7803, x: 14133
 -2.946688, 32.811012
+
+Bottom of Big Island in Hawaii:
+y: 5625, x: 1291
+18.880934, -155.640632
+
+North tip of Japan:
+y: 3381, x: 20355
+45.478073, 141.924065

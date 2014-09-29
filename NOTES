@@ -5,6 +5,11 @@ to plain old GeoJSON.
 
 I'm assuming that he's using Winkel Tripel, which has been inverted.
 
+I'm testing using a sample of 19 points from Google Maps and the projected SVG
+map. All latitudes are within 0.5 degrees. All longitudes are off by almost
+exactly 11 degrees (+/- 1 degree), which I suspect means I have a bug. Or that
+he clipped his Winkel.
+
 
 ---
 

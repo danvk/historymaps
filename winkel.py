@@ -45,11 +45,11 @@ class ScaledWinkel(object):
         return 180.0 / math.pi * r
 
     def invert(self, x, y):
+        '''Returns lon, lat.'''
         unitx = (2 * (float(x) / self._maxx) - 1) * self._maxunitx
         unity = (2 * (float(y) / self._maxy) - 1) * self._maxunity
         Lambda, phi = self._w.invert(unitx, unity)
         return self.r2d(Lambda), -self.r2d(phi)
-
 
 
 class Winkel(object):
@@ -64,32 +64,32 @@ class Winkel(object):
         )
 
     def invert(self, x, y):
-        Lambda = x
-        phi = y
+        Lambda = float(x)
+        phi = float(y)
         i = 25
         while True:
             cos_phi = math.cos(phi)
             sin_phi = math.sin(phi)
-            sin_2phi = math.sin(2 * phi)
+            sin_2phi = math.sin(2.0 * phi)
             sin2phi = sin_phi * sin_phi
             cos2phi = cos_phi * cos_phi
             sinlambda = math.sin(Lambda)
-            coslambda_2 = math.cos(Lambda / 2)
-            sinlambda_2 = math.sin(Lambda / 2)
+            coslambda_2 = math.cos(Lambda / 2.0)
+            sinlambda_2 = math.sin(Lambda / 2.0)
             sin2lambda_2 = sinlambda_2 * sinlambda_2
-            C = 1 - cos2phi * coslambda_2 * coslambda_2
+            C = 1.0 - cos2phi * coslambda_2 * coslambda_2
             if C != 0:
-                F = 1 / C
+                F = 1.0 / C
                 E = acos(cos_phi * coslambda_2) * math.sqrt(F)
             else:
-                E = 0
-                F = 0
-            fx = .5 * (2 * E * cos_phi * sinlambda_2 + Lambda / halfpi) - x
-            fy = .5 * (E * sin_phi + phi) - y
-            deltaxdeltaLambda = .5 * F * (cos2phi * sin2lambda_2 + E * cos_phi * coslambda_2 * sin2phi) + .5 / halfpi
-            deltaxdeltaphi = F * (sinlambda * sin_2phi / 4 - E * sin_phi * sinlambda_2)
-            deltaydeltaLambda = .125 * F * (sin_2phi * sinlambda_2 - E * sin_phi * cos2phi * sinlambda)
-            deltaydeltaphi = .5 * F * (sin2phi * coslambda_2 + E * sin2lambda_2 * cos_phi) + .5
+                E = 0.0
+                F = 0.0
+            fx = 0.5 * (2.0 * E * cos_phi * sinlambda_2 + Lambda / halfpi) - x
+            fy = 0.5 * (E * sin_phi + phi) - y
+            deltaxdeltaLambda = 0.5 * F * (cos2phi * sin2lambda_2 + E * cos_phi * coslambda_2 * sin2phi) + 0.5 / halfpi
+            deltaxdeltaphi = F * (sinlambda * sin_2phi / 4.0 - E * sin_phi * sinlambda_2)
+            deltaydeltaLambda = 0.125 * F * (sin_2phi * sinlambda_2 - E * sin_phi * cos2phi * sinlambda)
+            deltaydeltaphi = 0.5 * F * (sin2phi * coslambda_2 + E * sin2lambda_2 * cos_phi) + .5
             denominator = deltaxdeltaphi * deltaydeltaLambda - deltaydeltaphi * deltaxdeltaLambda
             deltaLambda = (fy * deltaxdeltaphi - fx * deltaydeltaphi) / denominator
             deltaphi = (fx * deltaydeltaLambda - fy * deltaxdeltaLambda) / denominator

@@ -90,14 +90,14 @@ def motions_to_lat_lons(motions):
         for i in range(0, len(coords), 2):
             x = coords[i]
             y = coords[i + 1]
-            lat, lon = w.invert(x, y)
+            lon, lat = w.invert(x, y)
             lls.append(lat)
             lls.append(lon)
         out_motions.append((letter, lls))
     return out_motions
 
 
-if __name__ == '__main__':
+def convert_countries_js():
     raw_js = open('several_countries.js').read()
     data = json.loads(raw_js[raw_js.index('['):raw_js.index('\n')])
 
@@ -119,3 +119,16 @@ if __name__ == '__main__':
     print json.dumps(out)
     sys.stderr.write('# of relative motions: %s\n' % num_relative)
     # viewBox="0 0 25201 15120"
+
+
+if __name__ == '__main__':
+    for idx, line in enumerate(open('coords.tsv')):
+        line = line.strip()
+        if idx == 0:
+            print '\t'.join([line] + ['invLat', 'invLon'])
+            continue
+
+        y, x, lat, lon = [float(v) for v in line.split('\t')]
+        inv_lon, inv_lat = w.invert(x, y)
+
+        print '\t'.join([line] + [str(inv_lat), str(inv_lon)])
