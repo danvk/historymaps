@@ -2,6 +2,7 @@
 import winkel
 import math
 import json
+import sys
 
 pi = math.pi
 
@@ -89,7 +90,11 @@ def motions_to_lat_lons(motions):
         for i in range(0, len(coords), 2):
             x = coords[i]
             y = coords[i + 1]
-
+            lat, lon = w.invert(x, y)
+            lls.append(lat)
+            lls.append(lon)
+        out_motions.append((letter, lls))
+    return out_motions
 
 
 if __name__ == '__main__':
@@ -106,8 +111,9 @@ if __name__ == '__main__':
                 motions = parse_draw_string(coords)
                 out_nations[name] = motions_to_lat_lons(motions)
 
+        sys.stderr.write('Done with %s\n' % year)
         out.append((year, out_nations))
 
-    print json.dumps(out, indent=1)
+    print json.dumps(out)
     sys.stderr.write('# of relative motions: %s\n' % num_relative)
     # viewBox="0 0 25201 15120"
