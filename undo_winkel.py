@@ -111,6 +111,8 @@ if __name__ == '__main__':
                 motions = parse_draw_string(coords)
                 out_nations[name] = motions_to_lat_lons(motions)
 
+        # Something isn't quite right here -- Sparta is ~10 degrees shifted
+        # Also have really short polygons (2 points) for Russia at the end
         sys.stderr.write('Done with %s\n' % year)
         out.append((year, out_nations))
 
