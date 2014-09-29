@@ -162,6 +162,17 @@ $(function(){
       }
     });
 
+  $('svg').on('click', function(e) {
+    e.preventDefault();
+    var svg = e.currentTarget;
+    var g = $(svg).find('g').get(0)
+    var pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    var svgPt = pt.matrixTransform(g.getScreenCTM().inverse());
+    console.log(svgPt);
+  });
+
   // this prevents the "page bounce" effect in Safari/Chrome on Lion.
   $(document).mousewheel(function(e) {
     e.preventDefault();
