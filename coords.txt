@@ -1,0 +1,67 @@
+Bottom of Malta:
+y: 4553, x: 12823
+lat/lon: 35.806034, 14.512733
+
+Gibraltar, African tip:
+y: 4543, x: 11546
+35.921134, -5.409956
+
+Tip of middle east in persian gulf:
+y: 5324, x: 15638
+26.376147, 56.376909
+
+Top of Australia:
+y: 8593, x: 21719
+-10.791194, 142.474015
+
+Bottom of New Zealand:
+y: 12097, x: 21631
+-47.369320, 167.544815
+
+Bottom of Madagascar:
+y: 9737, x: 14903
+-25.682104, 45.221032
+
+SW tip of Africa's gold coast:
+y: 7209, x: 1129
+4.274316, -7.521580
+
+Southern tip of Argentina:
+y: 12369, x: 8199
+-55.989661, -67.287205
+
+Easternmost part of Brazil:
+y: 8169, x: 9399
+-7.477739, -34.767675
+
+Westernmost part of South America:
+y: 7953, x: 6135
+-4.418500, -81.349704
+
+Bottom of Baja California:
+y: 5465, x: 4447
+22.877214, -110.037350
+
+Tip of the Yucatan:
+y: 5657, x: 5951
+21.493735, -87.010008
+
+Base of Nova Scotia:
+y: 3809, x: 7919
+43.420830, -65.652586
+
+NW tip of Vancouver:
+y: 2873, x: 4751
+50.789263, -128.368311
+
+Bottom of island in Hudson bay:
+y: 2089, x: 7751
+63.099923, -85.396973
+
+Westernmost tip of Iceland
+y: 2041, x: 10835
+65.506866, -24.541799
+
+Base of Lake Victoria inlet:
+y: 7803, x: 14133
+-2.946688, 32.811012
