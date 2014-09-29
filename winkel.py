@@ -33,6 +33,25 @@ def aitoff(Lambda, phi):
     )
 
 
+class ScaledWinkel(object):
+    def __init__(self, maxx, maxy):
+        self._maxx = maxx
+        self._maxy = maxy
+        self._w = Winkel()
+        self._maxunitx, _ = self._w.project(math.pi, 0.0)
+        _, self._maxunity = self._w.project(0.0, math.pi/2.0)
+
+    def r2d(self, r):
+        return 180.0 / math.pi * r
+
+    def invert(self, x, y):
+        unitx = (2 * (float(x) / self._maxx) - 1) * self._maxunitx
+        unity = (2 * (float(y) / self._maxy) - 1) * self._maxunity
+        Lambda, phi = self._w.invert(unitx, unity)
+        return self.r2d(Lambda), -self.r2d(phi)
+
+
+
 class Winkel(object):
     def __init__(self):
         pass

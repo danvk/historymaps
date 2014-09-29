@@ -5,6 +5,8 @@ import json
 
 pi = math.pi
 
+w = winkel.ScaledWinkel(25201, 15120)
+
 
 def explore_winkel():
     w = winkel.Winkel()
@@ -23,7 +25,10 @@ def explore_winkel():
     # Range is: x \in [-2.57079632679, 2.57079632679]
     #           y \in [-pi/2, +pi/2]
 
+num_relative = 0
+
 def parse_draw_string(string):
+    global num_relative
     parts = string.strip().split(' ');
 
     def lookahead_numbers(index):
@@ -47,9 +52,11 @@ def parse_draw_string(string):
             tuples.append((part, nums))
             i += 1 + len(nums)
         elif part in ['m', 'l']:
+            num_relative += 1
             nums = lookahead_numbers(i)
             i += 1 + len(nums)
         elif part == 'z':
+            tuples.append(('z', []))
             i += 1
         else:
             raise ValueError('Unknown command: "%s" in %s' % (part, string))
@@ -74,25 +81,33 @@ def extremes_from_path(path):
     return ((minx, miny), (maxx, maxy))
 
 
+def motions_to_lat_lons(motions):
+    '''Motions is a parse d= string. Converts x,y to lat,lon.'''
+    out_motions = []
+    for letter, coords in motions:
+        lls = []
+        for i in range(0, len(coords), 2):
+            x = coords[i]
+            y = coords[i + 1]
+
+
 
 if __name__ == '__main__':
     raw_js = open('several_countries.js').read()
     data = json.loads(raw_js[raw_js.index('['):raw_js.index('\n')])
-    minx = 1e9
-    miny = 1e9
-    maxx = -1e9
-    maxy = -1e9
 
+    out = []
     for year, nations in data:
+        out_nations = {}
         for name, coords in nations.iteritems():
-            if not coords: continue
-            motions = parse_draw_string(coords)
-            (tminx, tminy), (tmaxx, tmaxy) = extremes_from_path(motions)
-            minx = min(minx, tminx)
-            miny = min(miny, tminy)
-            maxx = max(maxx, tmaxx)
-            maxy = max(maxy, tmaxy)
+            if not coords:
+                out_nations[name] = coords
+            else:
+                motions = parse_draw_string(coords)
+                out_nations[name] = motions_to_lat_lons(motions)
 
-    print '(minx, miny) - (maxx, maxy) = (%s, %s) - (%s, %s)' % (
-            minx, miny, maxx, maxy)
-    # (minx, miny) - (maxx, maxy) = (865, 432) - (24807, 12216)
+        out.append((year, out_nations))
+
+    print json.dumps(out, indent=1)
+    sys.stderr.write('# of relative motions: %s\n' % num_relative)
+    # viewBox="0 0 25201 15120"
