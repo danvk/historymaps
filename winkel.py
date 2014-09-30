@@ -34,22 +34,33 @@ def aitoff(Lambda, phi):
 
 
 class ScaledWinkel(object):
-    def __init__(self, maxx, maxy):
+    def __init__(self, maxx, maxy, center_lon):
         self._maxx = maxx
         self._maxy = maxy
+        self._center_lon = center_lon
         self._w = Winkel()
         self._maxunitx, _ = self._w.project(math.pi, 0.0)
         _, self._maxunity = self._w.project(0.0, math.pi/2.0)
+
+    def recenter_lon(self, lon):
+        lon = lon + self._center_lon
+        if lon < -180.0:
+            lon += 360.0
+        elif lon > 180.0:
+            lon -= 360.0
+        return lon
 
     def r2d(self, r):
         return 180.0 / math.pi * r
 
     def invert(self, x, y):
-        '''Returns lon, lat.'''
+        '''Returns lon, lat. East and North are positive.'''
         unitx = (2 * (float(x) / self._maxx) - 1) * self._maxunitx
         unity = (2 * (float(y) / self._maxy) - 1) * self._maxunity
         Lambda, phi = self._w.invert(unitx, unity)
-        return self.r2d(Lambda), -self.r2d(phi)
+        lon, lat = self.r2d(Lambda), -self.r2d(phi)
+        lon = self.recenter_lon(lon)
+        return lon, lat
 
 
 class Winkel(object):

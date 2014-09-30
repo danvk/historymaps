@@ -6,7 +6,7 @@ import sys
 
 pi = math.pi
 
-w = winkel.ScaledWinkel(25201, 15120)
+w = winkel.ScaledWinkel(25201, 15120, +11.0)
 
 
 def explore_winkel():

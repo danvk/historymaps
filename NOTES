@@ -10,6 +10,10 @@ map. All latitudes are within 0.5 degrees. All longitudes are off by almost
 exactly 11 degrees (+/- 1 degree), which I suspect means I have a bug. Or that
 he clipped his Winkel.
 
+... or that he centered his Winkel around something other than the prime
+meridian!  Just looking at it, you can tell it's centered ~11 deg east of
+Greenwich.
+
 
 ---
 
