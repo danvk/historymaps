@@ -54,6 +54,26 @@ class WinkelTest(unittest.TestCase):
         self.assertEqual([],
             undo_winkel.interpolate_curves(path))
 
+    def test_path_to_coords(self):
+        path = undo_winkel.parse_draw_string('M 10 20 L 30 40 L 40 50 z')
+        self.assertEqual([[
+            [10, 20],
+            [30, 40],
+            [40, 50],
+            [10, 20]
+        ]], undo_winkel.path_to_coords(path))
+
+        path = undo_winkel.parse_draw_string('M 10 20 L 30 40 z M 30 30 L 40 50 z')
+        self.assertEqual([[
+            [10, 20],
+            [30, 40],
+            [10, 20],
+        ], [
+            [30, 30],
+            [40, 50],
+            [30, 30],
+        ]], undo_winkel.path_to_coords(path))
+
     def test_extremes_from_path(self):
         self.assertEquals(((100, 100), (200, 200)),
                 undo_winkel.extremes_from_path([('M', [100, 100]), ('L', [200, 200])]))

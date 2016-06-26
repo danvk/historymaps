@@ -171,19 +171,46 @@ def extremes_from_path(path):
     return ((minx, miny), (maxx, maxy))
 
 
-def motions_to_lat_lons(motions):
+def motions_to_lng_lats(motions):
     '''Motions is a parse d= string. Converts x,y to lat,lon.'''
     out_motions = []
-    for letter, coords in motions:
+    for motion, coords in motions:
         lls = []
         for i in range(0, len(coords), 2):
             x = coords[i]
             y = coords[i + 1]
             lon, lat = w.invert(x, y)
-            lls.append(lat)
             lls.append(lon)
-        out_motions.append((letter, lls))
+            lls.append(lat)
+        out_motions.append((motion, lls))
     return out_motions
+
+
+def path_to_coords(path):
+    '''Convert a parsed path to a GeoJSON-style coordinates array.'''
+    all_groups = []
+    this_group = None
+    for motion, coords in path:
+        if motion == 'M':
+            if this_group:
+                all_groups.append(this_group)
+            this_group = [coords]
+        elif motion == 'z':
+            this_group.append(this_group[0])
+        else:
+            this_group.append(coords)
+    if this_group:
+        all_groups.append(this_group)
+    return all_groups
+
+
+def shape_to_coords(d):
+    '''Convert an SVG path string to a GeoJSON-style coordinates array.'''
+    path = parse_draw_string(d)
+    path = absolutize_path(path)
+    path = interpolate_curves(path)
+    path = motions_to_lng_lats(path)
+    return path_to_coords(path)
 
 
 def convert_countries_js():
@@ -198,7 +225,7 @@ def convert_countries_js():
                 out_nations[name] = coords
             else:
                 motions = parse_draw_string(coords)
-                out_nations[name] = motions_to_lat_lons(motions)
+                out_nations[name] = motions_to_lng_lats(motions)
 
         # Something isn't quite right here -- Sparta is ~10 degrees shifted
         # Also have really short polygons (2 points) for Russia at the end

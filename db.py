@@ -40,6 +40,17 @@ class ShapesDb(object):
     rows = self._conn.execute("""select year, shape from shapes where country = ? order by year""", (name,))
     return [(row[0], row[1]) for row in rows]
 
+  def shape_for_country_year(self, name, year):
+    """Returns the shape for the country in the given year, or None if it didn't exist."""
+    cursor = self._conn.execute("""
+          select shape from shapes
+          where country = ? and year <= ?
+          order by year desc
+          limit 1
+    """, (name, year))
+    row = cursor.fetchone()
+    return row[0] if row else None
+
   def color_for_country(self, name):
     """Returns the fill color for the country."""
     rows = self._conn.execute("""select color, count(*) as count from shapes where country = ? group by color order by count desc""", (name,))
