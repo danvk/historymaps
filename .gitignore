@@ -3,3 +3,9 @@ US_Atlas*
 old-tiles
 tiles2
 countries-latlons.json
+worldhistorymaps
+*.pyc
+.DS_Store
+.idea
+*.sqlite
+*.db

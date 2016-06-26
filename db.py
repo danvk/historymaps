@@ -2,7 +2,7 @@
 
 import sqlite3
 
-db_file = "whm.db"
+db_file = "whm.sqlite"
 
 
 def create_db():
