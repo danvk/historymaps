@@ -26,7 +26,7 @@ def aitoff(Lambda, phi):
     '''
     cosphi = math.cos(phi)
     Lambda = Lambda / 2.0
-    sinci_alpha = sinci(acos(cosphi * math.cos(Lambda)));
+    sinci_alpha = sinci(acos(cosphi * math.cos(Lambda)))
     return (
         2 * cosphi * math.sin(Lambda) * sinci_alpha,
         math.sin(phi) * sinci_alpha
@@ -61,6 +61,9 @@ class ScaledWinkel(object):
         lon, lat = self.r2d(Lambda), -self.r2d(phi)
         lon = self.recenter_lon(lon)
         return lon, lat
+
+    def project(self, Lambda, phi):
+        pass
 
 
 class Winkel(object):
@@ -112,5 +115,5 @@ class Winkel(object):
                 continue
             else:
                 break
-        return [Lambda, phi];
+        return [Lambda, phi]
 

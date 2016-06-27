@@ -186,6 +186,18 @@ def motions_to_lng_lats(motions):
     return out_motions
 
 
+def flip_coords(motions):
+    '''Motions is a parsed SVG path. This replaces y with -y.'''
+    out_motions = []
+    for motion, coords in motions:
+        out = []
+        for i in range(0, len(coords), 2):
+            out.append(coords[i])
+            out.append(-coords[i + 1])
+        out_motions.append((motion, out))
+    return out_motions
+
+
 def path_to_coords(path):
     '''Convert a parsed path to a GeoJSON-style coordinates array.'''
     all_groups = []
@@ -209,7 +221,8 @@ def shape_to_coords(d):
     path = parse_draw_string(d)
     path = absolutize_path(path)
     path = interpolate_curves(path)
-    path = motions_to_lng_lats(path)
+    # path = motions_to_lng_lats(path)
+    path = flip_coords(path)
     return path_to_coords(path)
 
 
@@ -233,7 +246,6 @@ def convert_countries_js():
         out.append((year, out_nations))
 
     print json.dumps(out)
-    sys.stderr.write('# of relative motions: %s\n' % num_relative)
     # viewBox="0 0 25201 15120"
 
 
@@ -241,10 +253,13 @@ if __name__ == '__main__':
     for idx, line in enumerate(open('coords.tsv')):
         line = line.strip()
         if idx == 0:
-            print '\t'.join([line] + ['invLat', 'invLon'])
+            print '\t'.join([line] + ['invLat', 'invLon', 'dLat', 'dLon', 'rmse'])
             continue
 
         y, x, lat, lon = [float(v) for v in line.split('\t')]
         inv_lon, inv_lat = w.invert(x, y)
+        dLat = inv_lat - lat
+        dLon = inv_lon - lon
+        rmse = math.sqrt(dLat ** 2 + dLon ** 2)
 
-        print '\t'.join([line] + [str(inv_lat), str(inv_lon)])
+        print '\t'.join([line] + [str(x) for x in (inv_lat, inv_lon, dLat, dLon, rmse)])
